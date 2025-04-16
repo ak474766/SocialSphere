@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SocialSphere</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Base Styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8fafc;
+            color: #1f2937;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px; height: 100vh; position: fixed; left: 0; top: 0;
+            background-color: white; 
+            border-right: 1px solid rgba(229, 231, 235, 0.5);
+            transition: all 0.3s ease; z-index: 50;
+            box-shadow: 0 1px 15px rgba(0, 0, 0, 0.03);
+        }
+        .sidebar-item { 
+            padding: 14px 20px; 
+            display: flex; 
+            align-items: center; 
+            cursor: pointer; 
+            transition: all 0.2s ease;
+            margin: 4px 10px;
+            border-radius: 10px;
+        }
+        .sidebar-item:hover { 
+            background-color: #f1f5ff; 
+            transform: translateX(3px);
+        }
+        .sidebar-item.active { 
+            background-color: #eef2ff; 
+            color: #4f46e5; 
+            font-weight: 500; 
+            box-shadow: 0 2px 8px rgba(79, 70, 229, 0.15);
+        }
+        .sidebar-item.active i { color: #4f46e5; }
+        .sidebar-item i { 
+            margin-right: 12px; 
+            width: 20px; 
+            text-align: center; 
+            color: #6b7280; 
+            transition: color 0.2s ease; 
+        }
+
+        /* Content Area */
+        .content { 
+            margin-left: 260px; 
+            padding: 30px; 
+            min-height: 100vh; 
+            width: calc(100% - 260px); 
+        }
+        .section { 
+            display: none; 
+            animation: fadeIn 0.4s ease-out; 
+        }
+        .section.active { display: block; }
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(15px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+
+        /* Components */
+        .card { 
+            background-color: white; 
+            border-radius: 12px; 
+            box-shadow: 0 1px 10px rgba(0, 0, 0, 0.05), 0 1px 5px rgba(0,0,0,0.01); 
+            padding: 24px; 
+            margin-bottom: 24px; 
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .card:hover {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
+            transform: translateY(-2px);
+        }
+        .avatar {
+            width: 40px; height: 40px; 
+            border-radius: 50%; 
+            background-color: #e5e7eb;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; flex-shrink: 0; overflow: hidden; /* Crucial for img */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+        }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; } /* Make images fill avatar */
+        .btn { 
+            padding: 10px 18px; 
+            border-radius: 10px; 
+            font-weight: 500; 
+            cursor: pointer; 
+            transition: all 0.2s ease; 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; 
+            line-height: 1.5;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .btn:focus { outline: none; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.4); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-primary { 
+            background-color: #4f46e5; 
+            color: white; 
+            background-image: linear-gradient(135deg, #6366f1, #4f46e5);
+        }
+        .btn-primary:hover:not(:disabled) { background-color: #4338ca; }
+        .btn-secondary { 
+            background-color: #f3f4f6; 
+            color: #4b5563; 
+            border: 1px solid #e5e7eb; 
+        }
+        .btn-secondary:hover:not(:disabled) { background-color: #e5e7eb; }
+        .btn-danger { 
+            background-color: #ef4444; 
+            color: white;
+            background-image: linear-gradient(135deg, #f87171, #ef4444); 
+        }
+        .btn-danger:hover:not(:disabled) { background-color: #dc2626; }
+        .badge { 
+            background-color: #f3f4f6; 
+            color: #4b5563; 
+            padding: 5px 12px; 
+            border-radius: 9999px; 
+            font-size: 12px; 
+            font-weight: 500; 
+            white-space: nowrap; 
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+        .badge.interactive:hover { 
+            background-color: #e5e7eb; 
+            cursor: pointer;
+            transform: translateY(-1px);
+        }
+        .badge-primary { 
+            background-color: #e0e7ff; 
+            color: #3730a3;
+            box-shadow: 0 1px 2px rgba(55, 48, 163, 0.1);
+        }
+        .badge-primary.interactive:hover { background-color: #c7d2fe; }
+        .badge-success { 
+            background-color: #d1fae5; 
+            color: #047857;
+            box-shadow: 0 1px 2px rgba(4, 120, 87, 0.1);
+        }
+        .search-bar { 
+            padding: 12px 18px;
+            border-radius: 12px; 
+            border: 1px solid #e5e7eb; 
+            width: 100%; 
+            background-color: white; 
+            margin-bottom: 20px; 
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        .search-bar:focus { 
+            outline: none; 
+            border-color: #6366f1; 
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+            transform: translateY(-1px);
+        }
+
+        /* Messages Section Specific */
+        .chat-container { 
+            height: calc(100vh - 80px);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        .chat-list-sidebar { 
+            width: 320px; 
+            min-width: 320px; 
+            flex-shrink: 0;
+            border-right: 1px solid rgba(229, 231, 235, 0.5);
+        }
+        .main-chat-area { flex-grow: 1; }
+        .chat-item { 
+            border-left: 4px solid transparent; 
+            transition: all 0.2s ease;
+            border-radius: 0 8px 8px 0;
+        }
+        .chat-item:hover {
+            transform: translateX(3px);
+        }
+        .chat-item.active { 
+            background-color: #f3f4f6; 
+            border-left-color: #6366f1;
+        }
+        .message-received { 
+            background-color: #f3f4f6; 
+            align-self: flex-start;
+            border-radius: 18px;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+        .message-sent { 
+            background-color: #6366f1; 
+            color: white; 
+            align-self: flex-end;
+            border-radius: 18px;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 1px 3px rgba(99, 102, 241, 0.3);
+        }
+        #message-input { 
+            resize: none; 
+            overflow-y: hidden;
+            border-radius: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            padding: 12px 18px;
+        }
+
+        /* Videos Section Specific */
+        .video-app-container { 
+            height: calc(100vh - 80px); 
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        .video-feed { 
+            height: calc(100% - 60px); 
+            overflow-y: scroll; 
+            scroll-snap-type: y mandatory; 
+            background-color: #000;
+        }
+        .video-feed::-webkit-scrollbar { display: none; }
+        .video-feed { scrollbar-width: none; }
+        .video-container { 
+            height: 100%; 
+            scroll-snap-align: start; 
+            position: relative; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+        }
+        .video-player { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: contain; 
+            background-color: #000; 
+            cursor: pointer;
+        }
+        .video-info { 
+            position: absolute; 
+            bottom: 90px; 
+            left: 20px; 
+            max-width: 70%; 
+            z-index: 10; 
+            color: white; 
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            background: linear-gradient(0deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 100%);
+            padding: 15px 12px 10px;
+            border-radius: 10px;
+            backdrop-filter: blur(2px);
+        }
+        .social-actions { 
+            position: absolute; 
+            right: 20px; 
+            bottom: 90px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            gap: 24px; 
+            z-index: 10; 
+            color: white;
+        }
+        .action-button { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            cursor: pointer; 
+            transition: transform 0.25s ease;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+        }
+        .action-button:hover { 
+            transform: scale(1.15);
+        }
+        .action-count { 
+            font-size: 13px; 
+            margin-top: 4px; 
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+        }
+        .action-button i { 
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            font-size: 28px;
+        }
+        .action-button .liked { 
+            color: #f43f5e; 
+            transform: scale(1.1);
+            animation: heartPulse 0.5s ease;
+        }
+        @keyframes heartPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1.1); }
+        }
+        .navigation-bar { 
+            position: absolute; 
+            bottom: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 65px;
+            display: flex; 
+            justify-content: space-around; 
+            align-items: center; 
+            background: rgba(17, 24, 39, 0.85);
+            backdrop-filter: blur(10px); 
+            border-top: 1px solid #374151; 
+            z-index: 20; 
+            padding: 0 20px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.15);
+        }
+        .nav-item { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            color: #9ca3af; 
+            cursor: pointer; 
+            transition: all 0.2s ease;
+        }
+        .nav-item.active { 
+            color: white;
+            transform: translateY(-2px);
+        }
+        .nav-item:hover:not(.active) { 
+            color: #d1d5db;
+            transform: translateY(-1px);
+        }
+        .nav-item i { 
+            font-size: 20px; 
+            margin-bottom: 3px;
+        }
+        .nav-item span { 
+            font-size: 11px;
+            font-weight: 500;
+        }
+        .upload-button { 
+            width: 55px; 
+            height: 40px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            background: linear-gradient(to right, #ec4899, #6366f1); 
+            border-radius: 12px; 
+            margin-top: -22px; 
+            box-shadow: 0 4px 12px rgba(236, 72, 153, 0.4);
+            cursor: pointer; 
+            transition: transform 0.25s ease;
+        }
+        .upload-button:hover { 
+            transform: scale(1.1) translateY(-2px);
+            box-shadow: 0 6px 16px rgba(236, 72, 153, 0.5);
+        }
+        .upload-button i { 
+            color: white; 
+            font-size: 20px;
+        }
+        #upload-modal { 
+            background-color: rgba(0, 0, 0, 0.9); 
+            z-index: 100;
+            backdrop-filter: blur(5px);
+        }
+        #camera-container { 
+            background-color: #111827;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        .filter-btn { 
+            transition: all 0.2s ease;
+            transform-origin: center;
+        }
+        .filter-btn:active { 
+            transform: scale(0.92);
+        }
+        .sepia { filter: sepia(0.7); } 
+        .grayscale { filter: grayscale(1); } 
+        .vintage { filter: contrast(1.1) brightness(1.1) sepia(0.3); }
+
+        /* Forum Section Specific */
+        .forum-post { 
+            border-bottom: 1px solid #e5e7eb; 
+            padding: 18px 0; 
+            transition: all 0.15s ease; 
+            cursor: pointer;
+            border-radius: 8px;
+        }
+        .forum-post:hover { 
+            background-color: #f8fafc;
+            transform: translateX(5px);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+        .forum-post:last-child { 
+            border-bottom: none;
+        }
+        .vote-btn i { 
+            transition: all 0.2s ease;
+        }
+        .vote-btn.upvoted i { 
+            color: #f97316;
+            transform: scale(1.2);
+        }
+        .vote-btn.downvoted i { 
+            color: #3b82f6;
+            transform: scale(1.2);
+        }
+        .prose-custom { 
+            @apply prose prose-sm max-w-none text-gray-800;
+        }
+        .prose-custom ul { 
+            @apply list-disc list-inside;
+        }
+        .prose-custom strong { 
+            @apply font-semibold;
+        }
+        .prose-custom a { 
+            @apply text-indigo-600 hover:text-indigo-800;
+        }
+        #forum-post-detail .reply { 
+            border-top: 1px solid #f3f4f6;
+            transition: background-color 0.2s ease;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        #forum-post-detail .reply:hover {
+            background-color: #f9fafb;
+        }
+
+        /* Voice Rooms Specific */
+        .voice-room { 
+            border: 1px solid #e5e7eb; 
+            border-radius: 12px; 
+            padding: 20px; 
+            margin-bottom: 20px; 
+            transition: all 0.3s ease; 
+            position: relative; 
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+        .voice-room:hover:not(.joined) { 
+            border-color: #a5b4fc; 
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+            transform: translateY(-3px);
+        }
+        .voice-room.joining::after { 
+            content: ''; 
+            position: absolute; 
+            inset: 0; 
+            background-color: rgba(255, 255, 255, 0.7); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 5; 
+            animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        .voice-room.joined { 
+            border-color: #10b981; 
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3);
+            transform: scale(1.02);
+        }
+        @keyframes pulse { 
+            0%, 100% { opacity: 1; } 
+            50% { opacity: 0.5; } 
+        }
+
+        /* Networking Section Specific */
+        .profile-card { 
+            transition: all 0.3s ease;
+            border-radius: 12px;
+        }
+        .profile-card:hover { 
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            transform: translateY(-5px);
+        }
+        .job-card { 
+            border: 1px solid #e5e7eb; 
+            border-radius: 12px; 
+            padding: 20px; 
+            margin-bottom: 20px; 
+            transition: all 0.2s ease; 
+            cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+        .job-card:hover { 
+            border-color: #a5b4fc; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transform: translateY(-3px);
+        }
+        .job-card .bookmark-icon.fas { 
+            color: #fbbf24;
+            animation: bookmarkPulse 0.5s ease;
+        }
+        @keyframes bookmarkPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        #job-detail-modal { 
+            backdrop-filter: blur(8px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Settings Section Specific */
+        .settings-item { 
+            transition: all 0.2s ease; 
+            border-left: 3px solid transparent;
+            border-radius: 0 8px 8px 0;
+            margin: 2px 0;
+        }
+        .settings-item.active { 
+            background-color: #eef2ff; 
+            color: #4f46e5; 
+            font-weight: 500; 
+            border-left-color: #6366f1;
+            box-shadow: 0 1px 3px rgba(99, 102, 241, 0.1);
+        }
+        .settings-item:hover:not(.active) { 
+            background-color: #f3f4f6;
+            transform: translateX(3px);
+        }
+        .settings-item.active i { 
+            color: #4f46e5;
+        }
+        .settings-item i { 
+            color: #6b7280; 
+            transition: color 0.15s ease; 
+            margin-right: 10px;
+        }
+        .toggle-switch { 
+            position: relative; 
+            display: inline-block; 
+            width: 46px; 
+            height: 24px;
+        }
+        .toggle-switch input { 
+            display: none;
+        }
+        .toggle-slider { 
+            position: absolute; 
+            cursor: pointer; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            bottom: 0; 
+            background-color: #ccc; 
+            transition: .4s; 
+            border-radius: 24px;
+        }
+        .toggle-slider:before { 
+            position: absolute; 
+            content: ""; 
+            height: 18px; 
+            width: 18px; 
+            left: 3px; 
+            bottom: 3px; 
+            background-color: white; 
+            transition: .4s; 
+            border-radius: 50%;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        input:checked + .toggle-slider { 
+            background-color: #6366f1;
+        }
+        input:checked + .toggle-slider:before { 
+            transform: translateX(22px);
+        }
+
+        /* Toast Notification */
+        #toast-container { 
+            position: fixed; 
+            bottom: 25px; 
+            right: 25px; 
+            z-index: 1000;
+        }
+        .toast-animation { 
+            animation: slideInUpToast 0.4s ease-out forwards, fadeOutToast 0.4s ease-in 2.7s forwards;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        @keyframes slideInUpToast { 
+            from { transform: translateY(100%); opacity: 0; } 
+            to { transform: translateY(0); opacity: 1; } 
+        }
+        @keyframes fadeOutToast { 
+            from { opacity: 1; } 
+            to { opacity: 0; visibility: hidden; } 
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <div class="py-6 px-6 mb-6 border-b border-gray-200">
+            <h1 class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 flex items-center">
+                <div class="mr-3 h-9 w-9 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-md">
+                    <i class="fas fa-broadcast-tower text-white text-sm"></i>
+                </div>
+                SocialSphere
+            </h1>
+        </div>
+        <div class="sidebar-item active" data-section="messages"><i class="fas fa-comment-dots"></i><span>Messages</span></div>
+        <div class="sidebar-item" data-section="videos"><i class="fas fa-video"></i><span>Videos</span></div>
+        <div class="sidebar-item" data-section="forum"><i class="fas fa-comments"></i><span>Forum</span></div>
+        <div class="sidebar-item" data-section="voice-rooms"><i class="fas fa-microphone-alt"></i><span>Voice Rooms</span></div>
+        <div class="sidebar-item" data-section="networking"><i class="fas fa-user-tie"></i><span>Networking</span></div>
+        <div class="sidebar-item" data-section="settings"><i class="fas fa-cog"></i><span>Settings</span></div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="content">
+        <!-- Messages Section -->
+        <div class="section" id="messages">
+             <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="chat-container flex">
+                    <!-- Sidebar with chat list -->
+                    <div class="chat-list-sidebar bg-white border-r border-gray-200 flex flex-col">
+                        <!-- Header -->
+                        <div class="p-4 flex justify-between items-center border-b border-gray-200 flex-shrink-0"><h1 class="text-xl font-semibold">Chats</h1><div class="flex"><button id="new-chat-btn" class="p-2 text-gray-600 hover:bg-gray-100 rounded-full" title="New Chat"><i class="fas fa-edit text-lg"></i></button><button id="new-group-btn" class="p-2 text-gray-600 hover:bg-gray-100 rounded-full ml-1" title="New Group"><i class="fas fa-users text-lg"></i></button><button id="dark-mode-toggle" class="p-2 text-gray-600 hover:bg-gray-100 rounded-full ml-1" title="Toggle Dark Mode"><i class="fas fa-moon text-lg"></i></button></div></div>
+                        <!-- Search -->
+                        <div class="p-3 border-b border-gray-200 flex-shrink-0"><div class="relative"><input type="text" placeholder="Search messages..." class="w-full py-2 px-4 pr-10 rounded-full bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 border border-transparent focus:border-indigo-400"><i class="fas fa-search absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i></div></div>
+                        <!-- Chat List -->
+                        <div class="overflow-y-auto flex-1 chat-list-items">
+                            <div class="px-4 py-2 text-xs text-gray-500 font-medium">PINNED</div>
+                            <!-- John Doe - Pinned -->
+                            <div class="chat-item p-3 hover:bg-gray-50 cursor-pointer" data-chat-id="john-doe">
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center overflow-hidden">
+                                        <div class="avatar w-10 h-10 mr-3 relative flex-shrink-0">
+                                            <img src="https://i.pravatar.cc/40?u=john.doe@example.com" alt="John Doe">
+                                            <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
+                                        </div>
+                                        <div class="overflow-hidden"><h3 class="font-medium truncate">John Doe</h3><p class="text-sm text-gray-500 truncate">Sure, let's meet at 3pm tomorrow!</p></div>
+                                    </div>
+                                    <div class="text-right flex-shrink-0 pl-2"><p class="text-xs text-gray-500">12:34 PM</p><span class="inline-block text-xs bg-indigo-500 text-white rounded-full px-2 py-0.5 mt-1 font-medium">2</span></div>
+                                </div>
+                            </div>
+                            <div class="px-4 py-2 text-xs text-gray-500 font-medium">CHATS</div>
+                             <!-- Design Team -->
+                             <div class="chat-item p-3 hover:bg-gray-50 cursor-pointer" data-chat-id="design-team">
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center overflow-hidden">
+                                         <div class="avatar w-10 h-10 mr-3 relative flex-shrink-0 bg-purple-100"> <!-- Group avatar -->
+                                             <i class="fas fa-users text-purple-600"></i>
+                                         </div>
+                                        <div class="overflow-hidden"><h3 class="font-medium truncate">Design Team</h3><p class="text-sm text-gray-500 truncate">Alice: I've updated the mockups</p></div>
+                                    </div>
+                                    <div class="text-right flex-shrink-0 pl-2"><p class="text-xs text-gray-500">Yesterday</p></div>
+                                </div>
+                            </div>
+                             <!-- Jane Smith -->
+                            <div class="chat-item p-3 hover:bg-gray-50 cursor-pointer" data-chat-id="jane-smith">
+                                <div class="flex justify-between items-center">
+                                     <div class="flex items-center overflow-hidden">
+                                         <div class="avatar w-10 h-10 mr-3 relative flex-shrink-0">
+                                             <img src="https://i.pravatar.cc/40?u=jane.smith@example.com" alt="Jane Smith">
+                                             <!-- No online dot for offline -->
+                                         </div>
+                                        <div class="overflow-hidden"><h3 class="font-medium truncate">Jane Smith</h3><p class="text-sm text-gray-500 truncate">Did you check the document I sent?</p></div>
+                                    </div>
+                                    <div class="text-right flex-shrink-0 pl-2"><p class="text-xs text-gray-500">Yesterday</p></div>
+                                </div>
+                            </div>
+                            <!-- Robert Johnson -->
+                            <div class="chat-item p-3 hover:bg-gray-50 cursor-pointer" data-chat-id="robert-j">
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center overflow-hidden">
+                                        <div class="avatar w-10 h-10 mr-3 relative flex-shrink-0">
+                                             <img src="https://i.pravatar.cc/40?u=robert.j@example.com" alt="Robert Johnson">
+                                         </div>
+                                        <div class="overflow-hidden"><h3 class="font-medium truncate">Robert Johnson</h3><p class="text-sm text-gray-500 truncate">Thanks for the help!</p></div>
+                                    </div>
+                                    <div class="text-right flex-shrink-0 pl-2"><p class="text-xs text-gray-500">Wed</p></div>
+                                </div>
+                            </div>
+                            <!-- Emily Wilson -->
+                             <div class="chat-item p-3 hover:bg-gray-50 cursor-pointer" data-chat-id="emily-w">
+                                <div class="flex justify-between items-center">
+                                     <div class="flex items-center overflow-hidden">
+                                         <div class="avatar w-10 h-10 mr-3 relative flex-shrink-0">
+                                             <img src="https://i.pravatar.cc/40?u=emily.w@example.com" alt="Emily Wilson">
+                                             <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
+                                         </div>
+                                        <div class="overflow-hidden"><h3 class="font-medium truncate">Emily Wilson</h3><p class="text-sm text-gray-500 truncate">Let me know when you're available</p></div>
+                                    </div>
+                                    <div class="text-right flex-shrink-0 pl-2"><p class="text-xs text-gray-500">Tue</p></div>
+                                </div>
+                            </div>
+                             <!-- David Kim -->
+                             <div class="chat-item p-3 hover:bg-gray-50 cursor-pointer" data-chat-id="david-k">
+                                <div class="flex justify-between items-center">
+                                     <div class="flex items-center overflow-hidden">
+                                        <div class="avatar w-10 h-10 mr-3 relative flex-shrink-0">
+                                             <img src="https://i.pravatar.cc/40?u=david.k@example.com" alt="David Kim">
+                                         </div>
+                                        <div class="overflow-hidden"><h3 class="font-medium truncate">David Kim</h3><p class="text-sm text-gray-500 truncate">Just sent you the files</p></div>
+                                    </div>
+                                    <div class="text-right flex-shrink-0 pl-2"><p class="text-xs text-gray-500">Mon</p></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Main Chat Area -->
+                    <div class="main-chat-area flex-1 flex flex-col bg-white">
+                        <!-- Header -->
+                        <div class="p-3 flex justify-between items-center border-b border-gray-200 flex-shrink-0">
+                            <div class="flex items-center">
+                                <div class="flex items-center">
+                                    <div class="avatar w-10 h-10 mr-3 relative flex-shrink-0" id="chat-header-avatar-container">
+                                        <!-- Avatar loaded by JS -->
+                                        <img src="https://i.pravatar.cc/40?u=default" alt="Chat Avatar" id="chat-header-avatar">
+                                        <div class="absolute bottom-0 right-0 w-3 h-3 bg-gray-400 border-2 border-white rounded-full" id="chat-header-status-dot"></div>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-medium" id="chat-header-name">Select a Chat</h3>
+                                        <p class="text-xs text-gray-500" id="chat-header-status"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex">
+                                <button class="p-2 text-gray-600 hover:bg-gray-100 rounded-full" title="Search in conversation" id="search-chat-btn"><i class="fas fa-search"></i></button>
+                                <button class="p-2 text-gray-600 hover:bg-gray-100 rounded-full ml-1" id="call-btn" title="Voice call"><i class="fas fa-phone"></i></button>
+                                <button class="p-2 text-gray-600 hover:bg-gray-100 rounded-full ml-1" id="video-btn" title="Video call"><i class="fas fa-video"></i></button>
+                                <button class="p-2 text-gray-600 hover:bg-gray-100 rounded-full ml-1" id="chat-options-btn" title="Chat options"><i class="fas fa-ellipsis-v"></i></button>
+                            </div>
+                        </div>
+                        <!-- Messages -->
+                        <div class="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50 chat-messages-container">
+                            <p class="text-center text-gray-500 p-10">Select a chat to start messaging.</p>
+                        </div>
+                        <!-- Input -->
+                        <div class="p-4 border-t border-gray-200 flex items-center flex-shrink-0 bg-white">
+                            <button class="p-2.5 text-gray-600 hover:bg-gray-100 hover:text-indigo-600 rounded-full mr-2 flex-shrink-0 transition-all" title="Add attachment">
+                                <i class="fas fa-paperclip"></i>
+                            </button>
+                            <div class="flex-grow relative mr-2">
+                                <textarea placeholder="Type a message..." id="message-input" rows="1" class="w-full py-3 px-5 rounded-full bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 border border-transparent focus:border-indigo-400 pr-10 block transition-all"></textarea>
+                                <button class="absolute right-3.5 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-indigo-600 transition-all">
+                                    <i class="fas fa-smile"></i>
+                                </button>
+                            </div>
+                            <button class="p-2.5 text-gray-600 hover:bg-gray-100 hover:text-indigo-600 rounded-full ml-auto flex-shrink-0 transition-all" title="Voice message">
+                                <i class="fas fa-microphone"></i>
+                            </button>
+                            <button class="p-3 text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 rounded-full ml-2 flex-shrink-0 shadow-md hover:shadow-lg transition-all transform hover:scale-105" id="send-btn">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Videos Section -->
+        <div class="section" id="videos">
+             <div class="video-app-container bg-black text-white rounded-lg shadow-md overflow-hidden">
+                <div class="video-feed" id="video-feed"><div class="h-full flex items-center justify-center text-gray-500">Loading videos...</div></div>
+                <div class="navigation-bar">
+                    <div class="nav-item active">
+                        <div class="indicator h-1 w-6 bg-gradient-to-r from-pink-500 to-indigo-500 rounded-full mb-1.5"></div>
+                        <i class="fas fa-home"></i>
+                        <span class="text-xs">Home</span>
+                    </div>
+                    <div class="nav-item">
+                        <div class="indicator h-1 w-6 bg-transparent rounded-full mb-1.5"></div>
+                        <i class="fas fa-search"></i>
+                        <span class="text-xs">Discover</span>
+                    </div>
+                    <div class="upload-button" id="upload-video-btn">
+                        <i class="fas fa-plus"></i>
+                    </div>
+                    <div class="nav-item">
+                        <div class="indicator h-1 w-6 bg-transparent rounded-full mb-1.5"></div>
+                        <i class="fas fa-bell"></i>
+                        <span class="text-xs">Inbox</span>
+                    </div>
+                    <div class="nav-item">
+                        <div class="indicator h-1 w-6 bg-transparent rounded-full mb-1.5"></div>
+                        <i class="fas fa-user"></i>
+                        <span class="text-xs">Me</span>
+                    </div>
+                </div>
+            </div>
+            <div id="upload-modal" class="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center hidden p-4">
+                <div class="bg-gray-900 rounded-lg w-full max-w-md p-4 relative">
+                    <button id="close-upload-modal" class="absolute top-2 right-2 text-gray-400 hover:text-white text-2xl z-10">&times;</button>
+                    <h3 class="text-white text-lg font-bold mb-4 text-center">Create Video</h3>
+                    <div id="camera-container" class="w-full h-64 bg-black rounded-lg mb-4 flex items-center justify-center overflow-hidden relative"><i class="fas fa-video text-gray-600 text-4xl absolute" id="camera-placeholder"></i><video id="camera-preview" playsinline autoplay muted class="hidden w-full h-full object-cover"></video><video id="recorded-preview" playsinline controls class="hidden w-full h-full object-cover"></video></div>
+                    <div id="recording-controls" class="flex flex-col items-center"><div id="initial-controls"><button id="start-camera-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-full mb-3 font-medium">Enable Camera & Mic</button></div><div id="record-controls" class="hidden text-center"><p class="text-xs text-gray-400 mb-2">Tap to Record (Max 60s)</p><button id="record-btn" class="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center border-4 border-gray-800 ring-4 ring-red-500/50"><i class="fas fa-circle text-white text-xl"></i></button><button id="stop-btn" class="hidden w-16 h-16 bg-gray-500 rounded-full flex items-center justify-center border-4 border-gray-800"><i class="fas fa-stop text-white text-xl"></i></button></div><div id="edit-controls" class="hidden w-full"><div class="filter-options flex justify-center overflow-x-auto gap-3 py-2 mb-3"><button class="filter-btn text-xs bg-pink-500 text-white px-3 py-1 rounded-full" data-filter="normal">Normal</button><button class="filter-btn text-xs bg-gray-800 text-white px-3 py-1 rounded-full" data-filter="sepia">Sepia</button><button class="filter-btn text-xs bg-gray-800 text-white px-3 py-1 rounded-full" data-filter="grayscale">B&W</button><button class="filter-btn text-xs bg-gray-800 text-white px-3 py-1 rounded-full" data-filter="vintage">Vintage</button></div><input type="text" id="caption-input" placeholder="Add a caption..." class="w-full px-4 py-2 rounded-lg bg-gray-800 text-white border border-gray-700 focus:border-indigo-500 outline-none mb-3"><div class="flex justify-between gap-3"><button id="retake-btn" class="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-full font-medium">Retake</button><button id="upload-btn" class="flex-1 px-4 py-2 bg-pink-500 hover:bg-pink-600 text-white rounded-full font-medium">Upload</button></div><div id="upload-progress" class="hidden mt-3 w-full h-2 bg-gray-700 rounded-full overflow-hidden"><div id="progress-bar" class="h-full bg-green-500 transition-all duration-300" style="width: 0%"></div></div></div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Forum Section -->
+        <div class="section" id="forum">
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+                <h2 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-500">Community Forum</h2>
+                <div class="flex items-center gap-4 w-full sm:w-auto">
+                    <div class="relative flex-grow sm:flex-grow-0">
+                        <input type="text" class="search-bar !mb-0 !w-full !bg-white" placeholder="Search threads...">
+                        <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    </div>
+                    <button class="btn btn-primary flex-shrink-0 shadow-md hover:shadow-lg transition-all" id="new-thread-btn">
+                        <i class="fas fa-plus mr-2"></i>New Thread
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Rest of forum section content -->
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <div class="col-span-1">
+                    <div class="card mb-6"><div class="font-semibold mb-4">Categories</div><div class="space-y-1" id="forum-categories"><div class="category-item flex items-center p-2 rounded-lg hover:bg-gray-100 cursor-pointer" data-category-id="all"><i class="fas fa-globe-americas w-5 mr-3 text-gray-500"></i><span class="flex-1 truncate text-sm">All Posts</span></div><div class="category-item flex items-center p-2 rounded-lg hover:bg-gray-100 cursor-pointer" data-category-id="technology"><i class="fas fa-laptop-code w-5 mr-3 text-indigo-600"></i><span class="flex-1 truncate text-sm">Technology</span><span class="ml-2 bg-gray-200 text-gray-700 px-2 rounded-full text-xs font-medium">128</span></div><div class="category-item flex items-center p-2 rounded-lg hover:bg-gray-100 cursor-pointer" data-category-id="design"><i class="fas fa-palette w-5 mr-3 text-purple-600"></i><span class="flex-1 truncate text-sm">Design</span><span class="ml-2 bg-gray-200 text-gray-700 px-2 rounded-full text-xs font-medium">86</span></div><div class="category-item flex items-center p-2 rounded-lg hover:bg-gray-100 cursor-pointer" data-category-id="business"><i class="fas fa-briefcase w-5 mr-3 text-green-600"></i><span class="flex-1 truncate text-sm">Business</span><span class="ml-2 bg-gray-200 text-gray-700 px-2 rounded-full text-xs font-medium">64</span></div><div class="category-item flex items-center p-2 rounded-lg hover:bg-gray-100 cursor-pointer" data-category-id="frontend"><i class="fab fa-react w-5 mr-3 text-blue-500"></i><span class="flex-1 truncate text-sm">Frontend Dev</span><span class="ml-2 bg-gray-200 text-gray-700 px-2 rounded-full text-xs font-medium">95</span></div><div class="category-item flex items-center p-2 rounded-lg hover:bg-gray-100 cursor-pointer"><i class="fas fa-ellipsis-h w-5 mr-3 text-gray-500"></i><span class="flex-1 truncate text-sm">More...</span></div></div></div>
+                    <div class="card"><div class="font-semibold mb-4">Popular Tags</div><div class="flex flex-wrap gap-2 tags-container"><span class="badge interactive" data-tag-id="#javascript">#javascript</span><span class="badge interactive" data-tag-id="#design">#design</span><span class="badge interactive" data-tag-id="#webdev">#webdev</span><span class="badge interactive" data-tag-id="#css">#css</span><span class="badge interactive" data-tag-id="#ai">#ai</span><span class="badge interactive" data-tag-id="#react">#react</span><span class="badge interactive" data-tag-id="#frontend">#frontend</span><span class="badge interactive" data-tag-id="#productivity">#productivity</span></div></div>
+                </div>
+                <div class="col-span-1 lg:col-span-3">
+                    <div class="card" id="forum-list-card"><div class="flex justify-between items-center mb-4 pb-3 border-b"><div class="font-semibold" id="forum-current-filter">All Posts</div><div class="flex space-x-2"><button class="btn btn-secondary btn-sm text-xs px-2 py-1">Latest</button><button class="btn btn-secondary btn-sm text-xs px-2 py-1">Popular</button></div></div><div id="forum-posts-list" class="space-y-4"><p class="text-center text-gray-500 py-10">Loading posts...</p></div></div>
+                    <div id="forum-post-detail" class="hidden card"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Voice Rooms Section -->
+        <div class="section" id="voice-rooms">
+             <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4"><h2 class="text-2xl font-bold">Live Voice Rooms</h2><button class="btn btn-primary" id="create-room-btn"><i class="fas fa-plus mr-2"></i>Create Room</button></div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="col-span-1 md:col-span-2">
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center"><span class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>Live Now</h3>
+                         <div id="live-rooms-list" class="space-y-4">
+                             <!-- Room 1: Design Critique -->
+                            <div class="voice-room bg-white" data-room-id="design-critique">
+                                <div class="absolute top-4 right-4 z-10">
+                                    <div class="badge badge-success flex-shrink-0">
+                                        <i class="fas fa-headphones-alt mr-1"></i> 42 listening
+                                    </div>
+                                </div>
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="font-medium text-lg pr-4">Design Critique Session</div>
+                                </div>
+                                <div class="text-sm text-gray-600 mb-5 line-clamp-2">Weekly session where designers share their work and get feedback from the community. Join to share or just listen!</div>
+                                <div class="mb-5">
+                                    <div class="text-xs font-medium text-gray-500 mb-3 uppercase tracking-wider flex items-center">
+                                        <div class="w-2 h-2 bg-indigo-500 rounded-full mr-2"></div>
+                                        Speakers
+                                    </div>
+                                    <div class="flex -space-x-2 items-center speakers-list">
+                                        <div class="avatar w-10 h-10 border-2 border-white z-30 shadow-md"><img src="https://i.pravatar.cc/32?u=alice" alt="Alice"></div>
+                                        <div class="avatar w-10 h-10 border-2 border-white z-20 shadow-md"><img src="https://i.pravatar.cc/32?u=bob" alt="Bob"></div>
+                                        <div class="avatar w-10 h-10 border-2 border-white z-10 shadow-md"><img src="https://i.pravatar.cc/32?u=charlie" alt="Charlie"></div>
+                                        <div class="avatar w-10 h-10 bg-gray-100 border-2 border-white flex items-center justify-center text-gray-500 text-xs z-0 shadow-md">+5</div>
+                                    </div>
+                                </div>
+                                <div class="flex flex-wrap gap-2 justify-between items-center">
+                                    <div class="flex gap-2">
+                                        <span class="badge badge-primary">#design</span>
+                                        <span class="badge badge-primary">#ux</span>
+                                    </div>
+                                    <button class="btn btn-primary btn-sm px-4 py-2 mt-2 sm:mt-0 join-leave-btn shadow-md hover:shadow-lg hover:scale-105 transition-all">
+                                        <i class="fas fa-headphones mr-2"></i>Join Room
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- Room 2: Tech News -->
+                             <div class="voice-room bg-white" data-room-id="tech-news">
+                                <div class="flex justify-between items-start mb-3"><div class="font-medium text-lg pr-4">Tech News Roundup</div><div class="badge badge-success flex-shrink-0"><i class="fas fa-headphones-alt mr-1"></i> 87 listening</div></div>
+                                <div class="text-sm text-gray-600 mb-4 line-clamp-2">Daily discussion of the latest tech news and announcements. Today: Apple's new product launch and Twitter's latest update.</div>
+                                <div class="mb-4"><div class="text-xs font-medium text-gray-500 mb-2 uppercase tracking-wider">Speakers</div>
+                                    <div class="flex -space-x-2 items-center speakers-list">
+                                         <div class="avatar w-8 h-8 border-2 border-white z-30"><img src="https://i.pravatar.cc/32?u=diana" alt="Diana"></div>
+                                         <div class="avatar w-8 h-8 border-2 border-white z-20"><img src="https://i.pravatar.cc/32?u=ethan" alt="Ethan"></div>
+                                         <div class="avatar w-8 h-8 border-2 border-white z-10"><img src="https://i.pravatar.cc/32?u=fiona" alt="Fiona"></div>
+                                    </div>
+                                </div>
+                                 <div class="flex flex-wrap gap-2 justify-between items-center mt-4"><div class="flex gap-2"><span class="badge">#technews</span><span class="badge">#apple</span></div><button class="btn btn-primary btn-sm px-3 py-1 mt-2 sm:mt-0 join-leave-btn"><i class="fas fa-headphones mr-2"></i>Join Room</button></div>
+                            </div>
+                              <!-- Room 3: Coding Help -->
+                            <div class="voice-room bg-white" data-room-id="coding-help">
+                                <div class="flex justify-between items-start mb-3"><div class="font-medium text-lg pr-4">Coding Help: React & Next.js</div><div class="badge badge-success flex-shrink-0"><i class="fas fa-headphones-alt mr-1"></i> 35 listening</div></div>
+                                <div class="text-sm text-gray-600 mb-4 line-clamp-2">Got a coding problem? Join our expert developers to get help with your React and Next.js questions. Ask anything!</div>
+                                <div class="mb-4"><div class="text-xs font-medium text-gray-500 mb-2 uppercase tracking-wider">Speakers</div>
+                                    <div class="flex -space-x-2 items-center speakers-list">
+                                        <div class="avatar w-8 h-8 border-2 border-white z-30"><img src="https://i.pravatar.cc/32?u=george" alt="George"></div>
+                                        <div class="avatar w-8 h-8 border-2 border-white z-20"><img src="https://i.pravatar.cc/32?u=hannah" alt="Hannah"></div>
+                                    </div>
+                                </div>
+                                 <div class="flex flex-wrap gap-2 justify-between items-center mt-4"><div class="flex gap-2"><span class="badge">#react</span><span class="badge">#nextjs</span><span class="badge">#coding</span></div><button class="btn btn-primary btn-sm px-3 py-1 mt-2 sm:mt-0 join-leave-btn"><i class="fas fa-headphones mr-2"></i>Join Room</button></div>
+                            </div>
+                         </div>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="card mb-6"><div class="font-semibold mb-4">Upcoming</div><div class="space-y-4"><div class="scheduled-room pb-4 border-b border-gray-100" data-reminder-id="product-ama"><div class="font-medium mb-1 text-sm">Product Management AMA</div><div class="text-xs text-gray-600 mb-2">Ask-me-anything session.</div><div class="text-xs text-gray-500 mb-2"><i class="far fa-clock mr-1"></i> Today, 5:00 PM</div><button class="btn btn-secondary text-xs px-2 py-1 set-reminder-btn"><i class="far fa-bell mr-1"></i> Set Reminder</button></div><div class="scheduled-room pb-4 border-b border-gray-100" data-reminder-id="startup-funding"><div class="font-medium mb-1 text-sm">Startup Fundraising Strategies</div><div class="text-xs text-gray-600 mb-2">Learn how to pitch investors.</div><div class="text-xs text-gray-500 mb-2"><i class="far fa-clock mr-1"></i> Tomorrow, 2:00 PM</div><button class="btn btn-secondary text-xs px-2 py-1 set-reminder-btn"><i class="far fa-bell mr-1"></i> Set Reminder</button></div><div class="scheduled-room" data-reminder-id="ai-ethics"><div class="font-medium mb-1 text-sm">AI Ethics Discussion</div><div class="text-xs text-gray-600 mb-2">Exploring ethical AI implications.</div><div class="text-xs text-gray-500 mb-2"><i class="far fa-clock mr-1"></i> Friday, 4:00 PM</div><button class="btn btn-secondary text-xs px-2 py-1 set-reminder-btn"><i class="far fa-bell mr-1"></i> Set Reminder</button></div></div></div>
+                    <div class="card"><div class="font-semibold mb-4">Explore Categories</div><div class="space-y-1"><div class="category-item flex items-center p-2 rounded-lg hover:bg-gray-100 cursor-pointer" data-category-id="technology"><i class="fas fa-laptop-code text-indigo-600 w-5 mr-3"></i><span class="text-sm flex-1 truncate">Technology</span><span class="ml-2 text-gray-500 text-xs">24</span></div><div class="category-item flex items-center p-2 rounded-lg hover:bg-gray-100 cursor-pointer" data-category-id="business"><i class="fas fa-chart-line text-green-600 w-5 mr-3"></i><span class="text-sm flex-1 truncate">Business</span><span class="ml-2 text-gray-500 text-xs">18</span></div><div class="category-item flex items-center p-2 rounded-lg hover:bg-gray-100 cursor-pointer" data-category-id="design"><i class="fas fa-palette text-purple-600 w-5 mr-3"></i><span class="text-sm flex-1 truncate">Design</span><span class="ml-2 text-gray-500 text-xs">15</span></div><div class="category-item flex items-center p-2 rounded-lg hover:bg-gray-100 cursor-pointer" data-category-id="growth"><i class="fas fa-brain text-pink-600 w-5 mr-3"></i><span class="text-sm flex-1 truncate">Personal Growth</span><span class="ml-2 text-gray-500 text-xs">12</span></div><div class="category-item flex items-center p-2 rounded-lg hover:bg-gray-100 cursor-pointer"><i class="fas fa-ellipsis-h text-gray-500 w-5 mr-3"></i><span class="text-sm flex-1 truncate">See All</span></div></div></div>
+                </div>
+            </div>
+            <div id="create-room-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 p-4 hidden"><div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6 relative"><button onclick="closeModal('create-room-modal')" class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-2xl">&times;</button><h3 class="text-xl font-bold mb-4">Create Voice Room</h3><div class="mb-4"><label for="room-name" class="block text-sm font-medium text-gray-700 mb-1">Room Name</label><input type="text" id="room-name" placeholder="e.g., Weekly Design Sync" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"></div><div class="mb-4"><label for="room-topic" class="block text-sm font-medium text-gray-700 mb-1">Topic (Optional)</label><input type="text" id="room-topic" placeholder="e.g., Discussing new component library" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"></div><div class="mb-6"><label class="block text-sm font-medium text-gray-700 mb-1">Room Type</label><div class="flex space-x-4"><label class="flex items-center"><input type="radio" name="room-type" value="public" class="mr-1" checked> Public</label><label class="flex items-center"><input type="radio" name="room-type" value="private" class="mr-1"> Private</label></div></div><div class="flex justify-end space-x-3"><button onclick="closeModal('create-room-modal')" class="btn btn-secondary">Cancel</button><button class="btn btn-primary" id="confirm-create-room-btn">Create Room Now</button></div></div></div>
+        </div>
+
+        <!-- Networking Section -->
+        <div class="section" id="networking">
+             <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4"><h2 class="text-2xl font-bold">Professional Network</h2><div class="flex items-center gap-4 w-full sm:w-auto"><div class="relative flex-grow sm:flex-grow-0"><input type="text" id="networking-search" class="search-bar !mb-0 !w-full !bg-white" placeholder="Search jobs, people, skills..."><i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i></div><button class="btn btn-primary flex-shrink-0"><i class="fas fa-briefcase mr-2"></i>Post Job</button></div></div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="col-span-1">
+                     <div class="profile-card card sticky top-4">
+                        <div class="text-center mb-4">
+                             <!-- Use a consistent avatar URL for the main user -->
+                             <div class="avatar w-24 h-24 mx-auto mb-3 border-4 border-white shadow-lg bg-gradient-to-br from-indigo-50 to-purple-50 p-1">
+                                <img src="https://i.pravatar.cc/96?u=alex.johnson@example.com" alt="Alex Johnson" class="rounded-full">
+                             </div>
+                            <div class="font-bold text-xl mt-3">Alex Johnson</div>
+                            <div class="text-gray-600 text-sm">Senior Product Designer @ SocialSphere</div>
+                            <div class="text-xs text-gray-500 mt-1">San Francisco, CA</div>
+                        </div>
+                        <div class="border-t border-b border-gray-100 py-4 mb-4">
+                            <div class="flex justify-around text-center">
+                                <div class="hover:transform hover:scale-110 transition-all cursor-pointer">
+                                    <div class="font-bold text-lg text-indigo-600">245</div>
+                                    <div class="text-xs text-gray-500">Connections</div>
+                                </div>
+                                <div class="hover:transform hover:scale-110 transition-all cursor-pointer">
+                                    <div class="font-bold text-lg text-indigo-600">18</div>
+                                    <div class="text-xs text-gray-500">Posts</div>
+                                </div>
+                                <div class="hover:transform hover:scale-110 transition-all cursor-pointer">
+                                    <div class="font-bold text-lg text-indigo-600">42</div>
+                                    <div class="text-xs text-gray-500">Recommendations</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-4"><div class="font-medium mb-1 text-sm">About Me</div><div class="text-sm text-gray-600 leading-relaxed">Product designer with 8+ years of experience creating user-centered digital products. Specialized in UX/UI, design systems, and research. Passionate about building intuitive interfaces.</div></div>
+                        <div class="mb-4"><div class="font-medium mb-1 text-sm">Skills</div><div class="flex flex-wrap gap-2"><span class="badge interactive" data-skill-id="ux-design">UX Design</span><span class="badge interactive" data-skill-id="ui-design">UI Design</span><span class="badge interactive" data-skill-id="figma">Figma</span><span class="badge interactive" data-skill-id="design-systems">Design Systems</span><span class="badge interactive" data-skill-id="prototyping">Prototyping</span><span class="badge interactive" data-skill-id="user-research">User Research</span></div></div>
+                        <button class="btn btn-secondary w-full mt-2 text-sm" id="edit-profile-btn"><i class="fas fa-pen mr-2"></i>Edit Profile</button>
+                    </div>
+                </div>
+                <div class="col-span-1 lg:col-span-2">
+                    <div class="card mb-6"><div class="font-semibold mb-4" id="job-list-header">Recommended Jobs</div><div id="job-list" class="space-y-4"></div></div>
+                    <div class="card mb-6"><div class="font-semibold mb-4">Your Network</div><div id="connections-list" class="space-y-3"></div><div class="text-center mt-4"><a href="#" class="text-indigo-600 text-sm hover:underline font-medium">View all connections</a></div></div>
+                    <div class="card"><div class="font-semibold mb-4">Industry Insights</div><div class="space-y-4"><div class="article-item cursor-pointer hover:bg-gray-50 p-2 -m-2 rounded-md" data-article-id="future-remote-work"><div class="font-medium text-base mb-1">The Future of Remote Work in Tech</div><div class="text-sm text-gray-600 mb-2 line-clamp-2">How companies are adapting to remote-first policies and the impact on hiring trends...</div><div class="flex items-center text-xs text-gray-500"><span class="mr-3 font-medium">By Tech Insights</span><span><i class="far fa-clock mr-1"></i> 3 days ago</span></div></div><div class="article-item cursor-pointer hover:bg-gray-50 p-2 -m-2 rounded-md" data-article-id="design-trends-2023"><div class="font-medium text-base mb-1">Design Trends to Watch in 2023</div><div class="text-sm text-gray-600 mb-2 line-clamp-2">From neumorphism to glassmorphism: exploring the evolving landscape of UI design trends...</div><div class="flex items-center text-xs text-gray-500"><span class="mr-3 font-medium">By Design Weekly</span><span><i class="far fa-clock mr-1"></i> 5 days ago</span></div></div><div class="article-item cursor-pointer hover:bg-gray-50 p-2 -m-2 rounded-md" data-article-id="negotiate-salary"><div class="font-medium text-base mb-1">How to Negotiate Your Tech Salary</div><div class="text-sm text-gray-600 mb-2 line-clamp-2">Expert tips for getting the compensation you deserve in today's competitive job market...</div><div class="flex items-center text-xs text-gray-500"><span class="mr-3 font-medium">By Career Growth</span><span><i class="far fa-clock mr-1"></i> 1 week ago</span></div></div></div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Section -->
+        <div class="section" id="settings">
+            <div class="flex justify-between items-center mb-6"><h2 class="text-2xl font-bold">Settings</h2><button id="save-all-settings" class="btn btn-primary hidden">Save All Changes</button></div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="col-span-1"><div class="card"><div class="font-semibold mb-4">Settings Menu</div><div class="settings-nav space-y-1"><div class="settings-item flex items-center p-3 rounded-lg cursor-pointer" data-panel-id="settings-account-panel"><i class="fas fa-user-circle w-5 mr-3"></i><span class="text-sm">Account</span></div><div class="settings-item flex items-center p-3 rounded-lg cursor-pointer" data-panel-id="settings-notifications-panel"><i class="fas fa-bell w-5 mr-3"></i><span class="text-sm">Notifications</span></div><div class="settings-item flex items-center p-3 rounded-lg cursor-pointer" data-panel-id="settings-privacy-panel"><i class="fas fa-lock w-5 mr-3"></i><span class="text-sm">Privacy & Security</span></div><div class="settings-item flex items-center p-3 rounded-lg cursor-pointer" data-panel-id="settings-appearance-panel"><i class="fas fa-palette w-5 mr-3"></i><span class="text-sm">Appearance</span></div><div class="settings-item flex items-center p-3 rounded-lg cursor-pointer" data-panel-id="settings-language-panel"><i class="fas fa-language w-5 mr-3"></i><span class="text-sm">Language</span></div><div class="settings-item flex items-center p-3 rounded-lg cursor-pointer" data-panel-id="settings-help-panel"><i class="fas fa-question-circle w-5 mr-3"></i><span class="text-sm">Help & Support</span></div></div></div></div>
+                <div class="col-span-1 md:col-span-2 settings-panels-container">
+                    <div class="card" id="settings-account-panel"><form data-save-group="account"><div class="flex justify-between items-center mb-6"><h3 class="font-semibold text-lg">Account Settings</h3><button type="submit" class="btn btn-primary save-settings-btn">Save Changes</button></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4"><div><label class="block text-sm font-medium text-gray-700 mb-1" for="first-name">First Name</label><input type="text" id="first-name" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" value="Alex"></div><div><label class="block text-sm font-medium text-gray-700 mb-1" for="last-name">Last Name</label><input type="text" id="last-name" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" value="Johnson"></div></div><div class="mb-4"><label class="block text-sm font-medium text-gray-700 mb-1" for="email">Email</label><input type="email" id="email" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" value="alex.johnson@example.com"></div><div class="mb-4"><label class="block text-sm font-medium text-gray-700 mb-1" for="username">Username</label><input type="text" id="username" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" value="alexjohnson"></div><div class="mb-4"><label class="block text-sm font-medium text-gray-700 mb-1" for="bio">Bio</label><textarea id="bio" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" rows="3">Product designer with 8+ years of experience...</textarea></div><div class="mb-4"><label class="block text-sm font-medium text-gray-700 mb-1" for="location">Location</label><input type="text" id="location" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" value="San Francisco, CA"></div><div class="mb-6"><label class="block text-sm font-medium text-gray-700 mb-1" for="website">Website</label><input type="url" id="website" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" value="https://alexjohnson.design"></div></form></div>
+                    <div id="settings-notifications-panel" class="card hidden">
+                        <form data-save-group="notifications">
+                            <div class="flex justify-between items-center mb-6">
+                                <h3 class="font-semibold text-lg">Notifications Settings</h3>
+                                <button type="submit" class="btn btn-primary save-settings-btn">Save Changes</button>
+                            </div>
+                            <div class="space-y-6">
+                                <div class="flex justify-between items-center p-3 hover:bg-gray-50 rounded-lg transition-all">
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-800">Email Notifications</p>
+                                        <p class="text-xs text-gray-500 mt-1">Receive updates via email.</p>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="flex justify-between items-center p-3 hover:bg-gray-50 rounded-lg transition-all">
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-800">Push Notifications</p>
+                                        <p class="text-xs text-gray-500 mt-1">Get alerts on your device.</p>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="flex justify-between items-center p-3 hover:bg-gray-50 rounded-lg transition-all">
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-800">New Message Alerts</p>
+                                        <p class="text-xs text-gray-500 mt-1">Notify me about new messages.</p>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="flex justify-between items-center p-3 hover:bg-gray-50 rounded-lg transition-all">
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-800">Forum Mentions</p>
+                                        <p class="text-xs text-gray-500 mt-1">Notify when someone mentions you.</p>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div id="settings-privacy-panel" class="card hidden"><form data-save-group="privacy"><div class="flex justify-between items-center mb-6"><h3 class="font-semibold text-lg">Privacy & Security</h3><button type="submit" class="btn btn-primary save-settings-btn">Save Changes</button></div><div class="space-y-4"><div class="flex justify-between items-center"><p class="text-sm font-medium text-gray-800">Profile Visibility</p><select class="p-1 border border-gray-300 rounded text-sm"><option>Public</option><option>Connections Only</option><option>Private</option></select></div><div class="flex justify-between items-center"><p class="text-sm font-medium text-gray-800">Two-Factor Authentication</p><button class="btn btn-secondary btn-sm text-xs">Enable 2FA</button></div><div><p class="text-sm font-medium text-gray-800 mb-1">Blocked Users</p><p class="text-xs text-gray-500 mb-2">Users you have blocked will appear here.</p><button class="btn btn-secondary btn-sm text-xs">Manage Blocked Users</button></div></div></form></div>
+                    <div id="settings-appearance-panel" class="card hidden"><form data-save-group="appearance"><div class="flex justify-between items-center mb-6"><h3 class="font-semibold text-lg">Appearance Settings</h3><button type="submit" class="btn btn-primary save-settings-btn">Save Changes</button></div><div><label class="block text-sm font-medium text-gray-700 mb-2">Theme</label><div class="flex space-x-3"><button type="button" class="theme-btn flex-1 p-3 border rounded-lg text-center" data-theme="light"><i class="fas fa-sun mr-1"></i> Light</button><button type="button" class="theme-btn flex-1 p-3 border rounded-lg text-center bg-gray-100" data-theme="dark"><i class="fas fa-moon mr-1"></i> Dark</button><button type="button" class="theme-btn flex-1 p-3 border rounded-lg text-center bg-gray-100" data-theme="system"><i class="fas fa-desktop mr-1"></i> System</button></div></div></form></div>
+                     <div id="settings-language-panel" class="card hidden"><form data-save-group="language"><div class="flex justify-between items-center mb-6"><h3 class="font-semibold text-lg">Language Settings</h3><button type="submit" class="btn btn-primary save-settings-btn">Save Changes</button></div><div class="flex justify-between items-center"><p class="text-sm font-medium text-gray-800">Interface Language</p><select class="p-1 border border-gray-300 rounded text-sm"><option>English (US)</option><option>Español</option><option>Français</option></select></div></form></div>
+                     <div id="settings-help-panel" class="card hidden"><div class="font-semibold text-lg mb-6">Help & Support</div><p class="text-gray-600 mb-4">Find answers to common questions, access tutorials, or contact support.</p><div class="space-y-2"><a href="#" class="text-indigo-600 hover:underline block"><i class="fas fa-book w-5 mr-2"></i> Knowledge Base</a><a href="#" class="text-indigo-600 hover:underline block"><i class="fas fa-question-circle w-5 mr-2"></i> FAQs</a><a href="#" class="text-indigo-600 hover:underline block"><i class="fas fa-envelope w-5 mr-2"></i> Contact Support</a></div></div>
+                    <div id="settings-default-message" class="card hidden"><p>Selected settings panel not found.</p></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Global Toast Notification Area -->
+        <div id="toast-container"></div>
+    </div>
+
+
+    <script>
+        // --- Base JS ---
+        document.addEventListener('DOMContentLoaded', function() {
+            const sections = document.querySelectorAll('.section');
+            const sidebarItems = document.querySelectorAll('.sidebar-item');
+            let currentActiveSection = 'messages'; // Default section
+            let initializedSections = {}; // Track initialized sections
+
+            // --- Helper: Show Toast Notification ---
+            function showToast(message, type = 'success') {
+                 const toastContainer = document.getElementById('toast-container');
+                 if (!toastContainer) return;
+                 const toastId = `toast-${Date.now()}`;
+                 const toastClass = type === 'success' ? 'bg-green-500' : 'bg-red-500';
+                 const toastHTML = `<div id="${toastId}" class="fixed bottom-5 right-5 ${toastClass} text-white py-2 px-4 rounded-lg shadow-md text-sm toast-animation">${message}</div>`;
+                 toastContainer.insertAdjacentHTML('beforeend', toastHTML);
+                 const toastElement = document.getElementById(toastId);
+                 const style = document.createElement('style');
+                 style.innerHTML = `.toast-animation { animation: slideInUpToast 0.3s ease-out forwards, fadeOutToast 0.3s ease-in 2.7s forwards; } @keyframes slideInUpToast { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } } @keyframes fadeOutToast { from { opacity: 1; } to { opacity: 0; visibility: hidden; } }`;
+                 document.head.appendChild(style);
+                 setTimeout(() => { toastElement?.remove(); style.remove(); }, 3000);
+            }
+
+            // --- Helper Function to Switch Sections ---
+            function setActiveSection(sectionId) { /* ... (same as previous version) ... */
+                if (!sectionId) return;
+                sections.forEach(section => section.classList.remove('active'));
+                sidebarItems.forEach(item => item.classList.remove('active'));
+                const targetSection = document.getElementById(sectionId);
+                const targetSidebarItem = document.querySelector(`.sidebar-item[data-section="${sectionId}"]`);
+                if (targetSection) { targetSection.classList.add('active'); currentActiveSection = sectionId; window.scrollTo(0, 0); }
+                if (targetSidebarItem) { targetSidebarItem.classList.add('active'); }
+                if (!initializedSections[sectionId]) {
+                     switch (sectionId) {
+                        case 'messages': initializeMessages(); break;
+                        case 'videos': initializeVideoFeed(); break;
+                        case 'forum': initializeForum(); break;
+                        case 'voice-rooms': initializeVoiceRooms(); break;
+                        case 'networking': initializeNetworking(); break;
+                        case 'settings': initializeSettings(); break;
+                    }
+                    initializedSections[sectionId] = true;
+                }
+            }
+
+            // --- Sidebar Navigation Click Handler ---
+            sidebarItems.forEach(item => { /* ... (same as previous version) ... */
+                item.addEventListener('click', function() {
+                    const sectionId = this.getAttribute('data-section');
+                    setActiveSection(sectionId);
+                });
+             });
+
+            // --- Utility to Format Counts ---
+            function formatCount(num) { if (num >= 1000000) return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M'; if (num >= 1000) return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'K'; return num; }
+             // --- Global function to close modals ---
+             if (typeof window.closeModal === 'undefined') { window.closeModal = function(modalId) { document.getElementById(modalId)?.remove(); } }
+
+            // --- Section-Specific Initializers ---
+
+            // --- 1. Messages (Updated Avatar URLs) ---
+            function initializeMessages() {
+                console.log("Initializing Messages Section...");
+                const chatListContainer = document.querySelector('#messages .chat-list-items');
+                const mainChatHeader = document.querySelector('#messages .main-chat-area .p-3.flex.justify-between');
+                const mainChatHeaderAvatar = document.getElementById('chat-header-avatar');
+                const mainChatHeaderAvatarContainer = document.getElementById('chat-header-avatar-container');
+                const mainChatHeaderName = document.getElementById('chat-header-name');
+                const mainChatHeaderStatus = document.getElementById('chat-header-status');
+                const mainChatHeaderStatusDot = document.getElementById('chat-header-status-dot');
+                const mainChatMessagesContainer = document.querySelector('#messages .chat-messages-container');
+                const messageInput = document.getElementById('message-input');
+                const sendButton = document.getElementById('send-btn');
+
+                 if (!chatListContainer || !mainChatHeader || !mainChatMessagesContainer || !messageInput || !sendButton || !mainChatHeaderAvatar) { console.error("One or more message elements not found!"); return; }
+
+                // --- Mock Chat Data (Updated Avatars) ---
+                const chatData = {
+                    'john-doe': {
+                        name: 'John Doe', status: 'Online • Last seen 2m ago', avatarIcon: 'fa-user', // Keep icon for group fallback
+                        avatarUrl: 'https://i.pravatar.cc/40?u=john.doe@example.com', isOnline: true,
+                        messagesHTML: `<div class="text-center text-xs text-gray-500 mb-4">Today, 10:30 AM</div><div class="flex gap-3 max-w-md md:max-w-lg lg:max-w-xl"><div class="avatar w-8 h-8 flex-shrink-0 self-end"><img src="https://i.pravatar.cc/32?u=john.doe@example.com" alt="John Doe"></div><div class="flex flex-col items-start"><div class="bg-white p-3 rounded-lg rounded-bl-none shadow-sm max-w-xs sm:max-w-sm md:max-w-md"><p class="text-sm text-gray-800">Hi there! How are you doing today?</p></div><span class="text-xs text-gray-500 mt-1 ml-1">John Doe - 10:30 AM</span></div></div><div class="flex justify-end mt-2"><div class="flex flex-col items-end max-w-md md:max-w-lg lg:max-w-xl"><div class="bg-indigo-500 text-white p-3 rounded-lg rounded-br-none shadow-sm max-w-xs sm:max-w-sm md:max-w-md"><p class="text-sm">I'm doing well, thanks for asking! Just finishing up some work for the day. How about you?</p></div><div class="flex items-center mt-1"> <span class="text-xs text-gray-500 mr-1">10:32 AM</span> <span class="message-status"><i class="fas fa-check-double text-indigo-400"></i></span></div></div></div><div class="flex gap-3 max-w-md md:max-w-lg lg:max-w-xl mt-2"><div class="avatar w-8 h-8 flex-shrink-0 self-end"><img src="https://i.pravatar.cc/32?u=john.doe@example.com" alt="John Doe"></div><div class="flex flex-col items-start"><div class="bg-white p-3 rounded-lg rounded-bl-none shadow-sm max-w-xs sm:max-w-sm md:max-w-md"><p class="text-sm text-gray-800 mb-2">Good good. Check out this design I just finished!</p><img src="https://picsum.photos/seed/design1/300/200" alt="Design preview" class="rounded cursor-pointer mt-1 max-w-full h-auto"></div><span class="text-xs text-gray-500 mt-1 ml-1">John Doe - 10:45 AM</span></div></div><div class="flex justify-end mt-2"><div class="flex flex-col items-end max-w-md md:max-w-lg lg:max-w-xl"><div class="bg-indigo-500 text-white p-3 rounded-lg rounded-br-none shadow-sm max-w-xs sm:max-w-sm md:max-w-md"><div class="bg-indigo-700 p-2 rounded mb-2 border-l-2 border-white opacity-80"><p class="text-xs text-indigo-200 font-medium">John Doe</p><p class="text-xs text-indigo-100 truncate">Check out this design I just finished!</p></div><p class="text-sm">Looks amazing! I love the color palette you used. Great work!</p></div><div class="flex items-center mt-1"> <span class="text-xs text-gray-500 mr-1">10:48 AM</span> <span class="message-status"><i class="fas fa-check-double text-indigo-400"></i></span></div></div></div>`
+                    },
+                    'design-team': {
+                        name: 'Design Team', status: '5 members online', avatarIcon: 'fa-users', avatarBg: 'bg-purple-100', // Use background for group
+                        avatarUrl: null, // No single image for group
+                        isOnline: false, messagesHTML: `<div class="text-center text-xs text-gray-500 mb-4">Today, 9:15 AM</div><div class="flex gap-3 max-w-md md:max-w-lg lg:max-w-xl"><div class="avatar w-8 h-8 flex-shrink-0 self-end"><img src="https://i.pravatar.cc/32?u=alice@example.com" alt="Alice"></div><div class="flex flex-col items-start"><div class="bg-white p-3 rounded-lg rounded-bl-none shadow-sm max-w-xs sm:max-w-sm md:max-w-md"><p class="text-sm text-gray-800">Hey team, I've updated the mockups based on yesterday's feedback. Link: <a href='#' class='text-indigo-600 hover:underline'>design_v3.fig</a></p></div><span class="text-xs text-gray-500 mt-1 ml-1">Alice - 9:15 AM</span></div></div><div class="flex gap-3 max-w-md md:max-w-lg lg:max-w-xl mt-2"><div class="avatar w-8 h-8 flex-shrink-0 self-end"><img src="https://i.pravatar.cc/32?u=bob@example.com" alt="Bob"></div><div class="flex flex-col items-start"><div class="bg-white p-3 rounded-lg rounded-bl-none shadow-sm max-w-xs sm:max-w-sm md:max-w-md"><p class="text-sm text-gray-800">Looks great, Alice! Checking it now.</p></div><span class="text-xs text-gray-500 mt-1 ml-1">Bob - 9:18 AM</span></div></div><div class="flex justify-end mt-2"><div class="flex flex-col items-end max-w-md md:max-w-lg lg:max-w-xl"><div class="bg-indigo-500 text-white p-3 rounded-lg rounded-br-none shadow-sm max-w-xs sm:max-w-sm md:max-w-md"><p class="text-sm">Perfect, thanks Alice!</p></div><div class="flex items-center mt-1"> <span class="text-xs text-gray-500 mr-1">9:20 AM</span> <span class="message-status"><i class="fas fa-check-double text-indigo-400"></i></span></div></div></div>`
+                    },
+                     'jane-smith': {
+                        name: 'Jane Smith', status: 'Offline • Last seen yesterday', avatarIcon: 'fa-user',
+                        avatarUrl: 'https://i.pravatar.cc/40?u=jane.smith@example.com', isOnline: false,
+                        messagesHTML: `<div class="text-center text-xs text-gray-500 mb-4">Yesterday, 4:30 PM</div><div class="flex gap-3 max-w-md md:max-w-lg lg:max-w-xl"><div class="avatar w-8 h-8 flex-shrink-0 self-end"><img src="https://i.pravatar.cc/32?u=jane.smith@example.com" alt="Jane Smith"></div><div class="flex flex-col items-start"><div class="bg-white p-3 rounded-lg rounded-bl-none shadow-sm max-w-xs sm:max-w-sm md:max-w-md"><p class="text-sm text-gray-800">Did you check the document I sent over? Let me know your thoughts.</p></div><span class="text-xs text-gray-500 mt-1 ml-1">Jane Smith - 4:30 PM</span></div></div><div class="flex justify-end mt-2"><div class="flex flex-col items-end max-w-md md:max-w-lg lg:max-w-xl"><div class="bg-indigo-500 text-white p-3 rounded-lg rounded-br-none shadow-sm max-w-xs sm:max-w-sm md:max-w-md"><p class="text-sm">Yes, just finished reviewing it. Looks good overall! Added a few minor comments in the doc for you.</p></div><div class="flex items-center mt-1"><span class="text-xs text-gray-500 mr-1">4:35 PM</span><span class="message-status"><i class="fas fa-check-double text-gray-400"></i></span></div></div></div>`
+                    },
+                     'robert-j': { name: 'Robert Johnson', status: 'Offline', avatarIcon: 'fa-user', avatarUrl: 'https://i.pravatar.cc/40?u=robert.j@example.com', isOnline: false, messagesHTML: '<p class="p-10 text-center text-gray-500">No messages yet with Robert.</p>' },
+                     'emily-w': { name: 'Emily Wilson', status: 'Online', avatarIcon: 'fa-user', avatarUrl: 'https://i.pravatar.cc/40?u=emily.w@example.com', isOnline: true, messagesHTML: '<p class="p-10 text-center text-gray-500">No messages yet with Emily.</p>' },
+                     'david-k': { name: 'David Kim', status: 'Offline', avatarIcon: 'fa-user', avatarUrl: 'https://i.pravatar.cc/40?u=david.k@example.com', isOnline: false, messagesHTML: '<p class="p-10 text-center text-gray-500">No messages yet with David.</p>' },
+                };
+
+                // --- Update Main Chat View (Handles Image/Icon) ---
+                function loadChat(chatId) {
+                    const data = chatData[chatId];
+                    if (!data) { /* ... (error handling same as before) ... */ return; }
+
+                    mainChatHeaderName.textContent = data.name;
+                    mainChatHeaderStatus.textContent = data.status;
+
+                    // Handle Avatar display
+                    mainChatHeaderAvatarContainer.innerHTML = ''; // Clear previous content
+                     if (data.avatarUrl) {
+                         mainChatHeaderAvatarContainer.innerHTML = `
+                             <img src="${data.avatarUrl}" alt="${data.name}" class="w-full h-full object-cover">
+                             <div id="chat-header-status-dot" class="absolute bottom-0 right-0 w-3 h-3 ${data.isOnline ? 'bg-green-500' : 'bg-gray-400'} border-2 border-white rounded-full"></div>`;
+                         mainChatHeaderAvatarContainer.classList.remove('bg-purple-100'); // Remove group bg if switching to user
+                     } else { // Fallback for groups or missing images
+                         mainChatHeaderAvatarContainer.innerHTML = `
+                             <i class="fas ${data.avatarIcon || 'fa-user-circle'} ${data.avatarBg ? '' : 'text-purple-600'}"></i>
+                             <div id="chat-header-status-dot" class="hidden"></div>`; // Hide dot for groups
+                         if (data.avatarBg) mainChatHeaderAvatarContainer.classList.add(data.avatarBg); // Add group bg
+                     }
+
+                    mainChatMessagesContainer.innerHTML = data.messagesHTML;
+                    mainChatMessagesContainer.scrollTop = mainChatMessagesContainer.scrollHeight;
+                }
+
+                 // --- Other message functions (sendMessage, listeners) remain the same ---
+                 chatListContainer.addEventListener('click', function(event) { const clickedItem = event.target.closest('.chat-item'); if (!clickedItem) return; const chatId = clickedItem.dataset.chatId; if (!chatId) return; chatListContainer.querySelectorAll('.chat-item').forEach(item => item.classList.remove('active', 'bg-gray-50', 'border-l-4', 'border-indigo-500')); clickedItem.classList.add('active', 'bg-gray-50', 'border-l-4', 'border-indigo-500'); loadChat(chatId); });
+                 function sendMessage() { const text = messageInput.value.trim(); if (text && mainChatMessagesContainer) { const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); const newMessageHTML = `<div class="flex justify-end mt-2"><div class="flex flex-col items-end max-w-md md:max-w-lg lg:max-w-xl"><div class="bg-indigo-500 text-white p-3 rounded-lg rounded-br-none shadow-sm max-w-xs sm:max-w-sm md:max-w-md"><p class="text-sm">${text.replace(/\n/g, '<br>')}</p></div><div class="flex items-center mt-1"><span class="text-xs text-gray-500 mr-1">${timestamp}</span><span class="message-status"><i class="fas fa-check text-gray-400"></i></span></div></div></div>`; if (mainChatMessagesContainer.querySelector('p.text-center')) { mainChatMessagesContainer.innerHTML = newMessageHTML; } else { mainChatMessagesContainer.insertAdjacentHTML('beforeend', newMessageHTML); } mainChatMessagesContainer.scrollTop = mainChatMessagesContainer.scrollHeight; messageInput.value = ''; messageInput.style.height = 'auto'; messageInput.focus(); const lastMessage = mainChatMessagesContainer.querySelector('.flex.justify-end:last-child'); if (lastMessage) { const newMsgStatusIcon = lastMessage.querySelector('.message-status i'); if (newMsgStatusIcon) { setTimeout(() => { newMsgStatusIcon.className = 'fas fa-check-double text-gray-500'; setTimeout(() => { newMsgStatusIcon.className = 'fas fa-check-double text-indigo-400'; }, 1500); }, 800); } } } }
+                 sendButton.addEventListener('click', sendMessage);
+                 messageInput.addEventListener('keydown', function(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } setTimeout(() => { this.style.height = 'auto'; this.style.height = (this.scrollHeight) + 'px'; }, 0); });
+                 document.getElementById('search-chat-btn')?.addEventListener('click', () => alert('Search within chat triggered!')); document.getElementById('call-btn')?.addEventListener('click', () => alert('Voice call started! (Simulation)')); document.getElementById('video-btn')?.addEventListener('click', () => alert('Video call started! (Simulation)')); document.getElementById('chat-options-btn')?.addEventListener('click', () => alert('Chat options opened! (Simulation)')); document.getElementById('new-chat-btn')?.addEventListener('click', () => alert('New Chat action!')); document.getElementById('new-group-btn')?.addEventListener('click', () => alert('New Group action!'));
+                 const initialActive = chatListContainer.querySelector('.chat-item[data-chat-id="john-doe"]'); if (initialActive) { initialActive.click(); } else { const firstChat = chatListContainer.querySelector('.chat-item'); if(firstChat) { firstChat.click(); } else { loadChat(null); } }
+            }
+
+
+            // --- 2. Videos (Updated Avatar URLs) ---
+            function initializeVideoFeed() {
+                 console.log("Initializing Video Feed...");
+                 const videoFeed = document.getElementById('video-feed');
+                 /* ... (rest of video element selectors same as before) ... */
+                 const uploadModal = document.getElementById('upload-modal'); const closeUploadModal = document.getElementById('close-upload-modal'); const uploadVideoBtn = document.getElementById('upload-video-btn'); const startCameraBtn = document.getElementById('start-camera-btn'); const recordBtn = document.getElementById('record-btn'); const stopBtn = document.getElementById('stop-btn'); const retakeBtn = document.getElementById('retake-btn'); const uploadBtn = document.getElementById('upload-btn'); const cameraPreview = document.getElementById('camera-preview'); const recordedPreview = document.getElementById('recorded-preview'); const cameraPlaceholder = document.getElementById('camera-placeholder'); const initialControls = document.getElementById('initial-controls'); const recordControls = document.getElementById('record-controls'); const editControls = document.getElementById('edit-controls'); const uploadProgress = document.getElementById('upload-progress'); const progressBar = document.getElementById('progress-bar'); const captionInput = document.getElementById('caption-input');
+                 if (!videoFeed || !uploadModal || !closeUploadModal || !uploadVideoBtn || !startCameraBtn) { console.error("One or more video elements not found!"); return; }
+                 let mediaRecorder; let recordedChunks = []; let selectedFilter = 'normal'; let mediaStream = null;
+
+                // --- Mock Video Data (Updated Avatars) ---
+                 const mockVideos = [
+                    { id: 1, url: 'https://assets.mixkit.co/videos/preview/mixkit-portrait-of-a-fashion-woman-with-silver-makeup-39875-large.mp4', thumbnail: 'https://via.placeholder.com/640x1138/111827/FFFFFF/?text=Loading...', username: 'fashionista', userAvatar: 'https://i.pravatar.cc/48?u=fashionista', caption: 'New makeup look for the weekend! ✨ Feeling glamorous. #fashion #beauty #makeup #style', likes: 1243, comments: 88, shares: 105, isLiked: false },
+                    { id: 2, url: 'https://assets.mixkit.co/videos/preview/mixkit-tree-with-yellow-flowers-1173-large.mp4', thumbnail: 'https://via.placeholder.com/640x1138/111827/FFFFFF/?text=Loading...', username: 'naturelover', userAvatar: 'https://i.pravatar.cc/48?u=naturelover', caption: 'Beautiful spring blossoms 🌸 Nothing beats nature\'s beauty. #nature #spring #flowers #outdoors', likes: 856, comments: 42, shares: 76, isLiked: true },
+                    { id: 3, url: 'https://assets.mixkit.co/videos/preview/mixkit-hands-holding-a-smart-watch-with-the-stopwatch-running-32808-large.mp4', thumbnail: 'https://via.placeholder.com/640x1138/111827/FFFFFF/?text=Loading...', username: 'techenthusiast', userAvatar: 'https://i.pravatar.cc/48?u=techgeek', caption: 'Check out this new smartwatch feature! Tracking my progress. ⌚️ #tech #gadgets #smartwatch #fitness', likes: 2451, comments: 153, shares: 230, isLiked: false }
+                 ];
+
+                // --- Populate Videos (Uses userAvatar from data) ---
+                function populateVideos() {
+                    videoFeed.innerHTML = '';
+                    mockVideos.forEach((video, index) => {
+                        const videoContainer = document.createElement('div');
+                        videoContainer.className = 'video-container';
+                        videoContainer.dataset.index = index; videoContainer.dataset.videoId = video.id;
+                        videoContainer.innerHTML = `
+                            <video class="video-player" src="${video.url}" poster="${video.thumbnail}" loop playsinline preload="metadata" onclick="togglePlayPause(this)"></video>
+                            <div class="video-info"><p class="font-semibold mb-1 cursor-pointer hover:underline" onclick="viewUserProfile('${video.username}')">@${video.username}</p><p class="text-sm leading-tight">${video.caption}</p></div>
+                            <div class="social-actions">
+                                 <div class="action-button mb-3" onclick="viewUserProfile('${video.username}')">
+                                    <div class="avatar w-12 h-12 border-2 border-white"><img src="${video.userAvatar}" alt="${video.username}"></div>
+                                 </div>
+                                <div class="action-button" onclick="handleLike(this, ${video.id})"><i class="fas fa-heart text-3xl ${video.isLiked ? 'liked' : ''}"></i><span class="action-count">${formatCount(video.likes)}</span></div>
+                                <div class="action-button" onclick="handleComment(this, ${video.id})"><i class="fas fa-comment-dots text-3xl"></i><span class="action-count">${formatCount(video.comments)}</span></div>
+                                <div class="action-button" onclick="handleShare(this, ${video.id})"><i class="fas fa-share text-3xl"></i><span class="action-count">${formatCount(video.shares)}</span></div>
+                            </div>`;
+                        videoFeed.appendChild(videoContainer);
+                    });
+                    setupVideoObserver();
+                }
+
+                 // --- Other video functions (togglePlayPause, handleLike, handleComment, handleShare, viewUserProfile, setupVideoObserver, upload logic) remain the same ---
+                  window.togglePlayPause = function(videoElement) { if (videoElement.paused) { document.querySelectorAll('.video-player').forEach(v => { if (v !== videoElement) v.pause(); }); videoElement.play().catch(e => console.error("Play error:", e)); } else { videoElement.pause(); } };
+                  window.handleLike = function(button, videoId) { const icon = button.querySelector('i'); const countElement = button.querySelector('.action-count'); const videoIndex = mockVideos.findIndex(v => v.id === videoId); if (videoIndex === -1) return; mockVideos[videoIndex].isLiked = !mockVideos[videoIndex].isLiked; if (mockVideos[videoIndex].isLiked) { icon.classList.add('liked'); mockVideos[videoIndex].likes++; } else { icon.classList.remove('liked'); mockVideos[videoIndex].likes--; } countElement.textContent = formatCount(mockVideos[videoIndex].likes); icon.style.transform = 'scale(1.2)'; setTimeout(() => { icon.style.transform = 'scale(1)'; }, 150); };
+                  window.handleComment = function(button, videoId) { console.log("Comment button clicked for video:", videoId); alert(`Showing comments for video ${videoId}! (Simulation)`); };
+                  window.handleShare = function(button, videoId) { console.log("Share button clicked for video:", videoId); alert(`Sharing video ${videoId}! (Simulation)`); };
+                  window.viewUserProfile = function(username) { console.log("View profile clicked for user:", username); alert(`Navigating to profile of @${username}! (Simulation)`); };
+                  let videoObserver; function setupVideoObserver() { const options = { root: videoFeed, threshold: 0.7 }; if (videoObserver) videoObserver.disconnect(); videoObserver = new IntersectionObserver((entries) => { entries.forEach(entry => { const videoElement = entry.target.querySelector('.video-player'); if (!videoElement) return; if (entry.isIntersecting) { document.querySelectorAll('.video-player').forEach(v => { if (v !== videoElement && !v.paused) { v.pause(); } }); videoElement.play().catch(err => { console.log('Autoplay prevented:', err); }); } else { videoElement.pause(); } }); }, options); document.querySelectorAll('.video-container').forEach(container => { videoObserver.observe(container); }); }
+                  uploadVideoBtn.addEventListener('click', function() { uploadModal.classList.remove('hidden'); resetUploadUI(); }); closeUploadModal.addEventListener('click', function() { uploadModal.classList.add('hidden'); stopCamera(); }); startCameraBtn.addEventListener('click', async function() { try { mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: true }); cameraPreview.srcObject = mediaStream; cameraPreview.classList.remove('hidden'); cameraPlaceholder.classList.add('hidden'); initialControls.classList.add('hidden'); recordControls.classList.remove('hidden'); recordBtn.classList.remove('hidden'); stopBtn.classList.add('hidden'); cameraPreview.play(); mediaRecorder = new MediaRecorder(mediaStream); mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) recordedChunks.push(e.data); }; mediaRecorder.onstop = () => { const blob = new Blob(recordedChunks, { type: 'video/mp4' }); const videoURL = URL.createObjectURL(blob); recordedPreview.src = videoURL; recordedPreview.classList.remove('hidden'); cameraPreview.classList.add('hidden'); editControls.classList.remove('hidden'); recordControls.classList.add('hidden'); stopCamera(false); }; } catch (error) { console.error('Error accessing camera/mic:', error); alert('Could not access camera or microphone. Please check permissions.'); initialControls.classList.remove('hidden'); recordControls.classList.add('hidden'); } }); recordBtn.addEventListener('click', function() { if (!mediaRecorder) return; recordedChunks = []; mediaRecorder.start(); recordBtn.classList.add('hidden'); stopBtn.classList.remove('hidden'); setTimeout(() => { if (mediaRecorder && mediaRecorder.state === 'recording') { mediaRecorder.stop(); } }, 60000); }); stopBtn.addEventListener('click', function() { if (mediaRecorder && mediaRecorder.state === 'recording') { mediaRecorder.stop(); } }); retakeBtn.addEventListener('click', function() { resetUploadUI(true); startCameraBtn.click(); }); document.querySelectorAll('.filter-btn').forEach(btn => { btn.addEventListener('click', function() { selectedFilter = this.dataset.filter; document.querySelectorAll('.filter-btn').forEach(b => b.classList.replace('bg-pink-500', 'bg-gray-800')); this.classList.replace('bg-gray-800', 'bg-pink-500'); recordedPreview.className = 'hidden w-full h-full object-cover playsinline controls'; if (selectedFilter !== 'normal') { recordedPreview.classList.add(selectedFilter); } recordedPreview.classList.remove('hidden'); }); }); uploadBtn.addEventListener('click', function() { if (recordedChunks.length === 0 || !recordedPreview.src) { alert("No video recorded to upload."); return; } uploadProgress.classList.remove('hidden'); uploadBtn.disabled = true; retakeBtn.disabled = true; let progress = 0; const interval = setInterval(() => { progress += Math.random() * 10 + 5; progress = Math.min(progress, 100); progressBar.style.width = `${progress}%`; if (progress >= 100) { clearInterval(interval); console.log("Upload complete (simulated)"); const caption = captionInput.value || 'My new video!'; const newVideo = { id: Date.now(), url: recordedPreview.src, thumbnail: '', username: 'me', userAvatar: 'https://i.pravatar.cc/48?u=me', caption: caption, likes: 0, comments: 0, shares: 0, isLiked: false }; mockVideos.unshift(newVideo); populateVideos(); setTimeout(() => { uploadModal.classList.add('hidden'); resetUploadUI(); videoFeed.scrollTop = 0; }, 500); } }, 300); }); function stopCamera(fullStop = true) { if (mediaStream) { mediaStream.getTracks().forEach(track => track.stop()); console.log("Camera stopped."); } if(fullStop) mediaStream = null; if (cameraPreview.srcObject) { cameraPreview.pause(); cameraPreview.srcObject = null; } } function resetUploadUI(isRetake = false) { stopCamera(); cameraPreview.classList.add('hidden'); recordedPreview.classList.add('hidden'); recordedPreview.src = ''; cameraPlaceholder.classList.remove('hidden'); initialControls.classList.remove('hidden'); recordControls.classList.add('hidden'); editControls.classList.add('hidden'); uploadProgress.classList.add('hidden'); progressBar.style.width = '0%'; captionInput.value = ''; recordedChunks = []; uploadBtn.disabled = false; retakeBtn.disabled = false; document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.replace('bg-pink-500', 'bg-gray-800')); document.querySelector('.filter-btn[data-filter="normal"]')?.classList.replace('bg-gray-800', 'bg-pink-500'); selectedFilter = 'normal'; if (!isRetake) { recordBtn.classList.add('hidden'); stopBtn.classList.add('hidden'); } }
+
+                 populateVideos(); // Initial Population
+            }
+
+
+             // --- 3. Forum (Updated Avatar URLs) ---
+            function initializeForum() {
+                console.log("Initializing Enhanced Forum Section...");
+                 /* ... (selectors same as before) ... */
+                 const forumContainer = document.getElementById('forum'); const categoriesContainer = document.getElementById('forum-categories'); const tagsContainer = forumContainer.querySelector('.tags-container'); const postsListContainer = document.getElementById('forum-posts-list'); const postDetailContainer = document.getElementById('forum-post-detail'); const forumListCard = document.getElementById('forum-list-card'); const forumSearch = forumContainer.querySelector('.search-bar'); const newThreadBtn = document.getElementById('new-thread-btn'); const currentFilterDisplay = document.getElementById('forum-current-filter');
+                 if (!forumContainer || !categoriesContainer || !tagsContainer || !postsListContainer || !postDetailContainer || !forumListCard || !forumSearch || !newThreadBtn || !currentFilterDisplay) { console.error("One or more forum elements not found for enhanced initialization!"); return; }
+
+                // --- Mock Post Data (Updated Avatars) ---
+                const forumPostsData = {
+                    'post-js-framework': { id: 'post-js-framework', title: "What's your favorite JavaScript framework in 2023?", content: "<p>I've been using React for years... Let's discuss the pros and cons!</p>", author: '@techguru', authorAvatar: 'https://i.pravatar.cc/32?u=techguru', time: '2 hours ago', upvotes: 42, views: 1258, replyCount: 3, isUpvoted: false, isDownvoted: false, replies: [ { id: 'reply-1', author: '@vuefan', authorAvatar: 'https://i.pravatar.cc/32?u=vuefan', text: 'Definitely Vue 3! Composition API is a game changer...', time: '1 hour ago', upvotes: 15 }, { id: 'reply-2', author: '@svelte_dev', authorAvatar: 'https://i.pravatar.cc/32?u=svelte_dev', text: 'SvelteKit all the way. Less boilerplate...', time: '45 mins ago', upvotes: 18 }, { id: 'reply-3', author: '@react_lover', authorAvatar: 'https://i.pravatar.cc/32?u=react_lover', text: 'Still sticking with React + Next.js...', time: '30 mins ago', upvotes: 9 }, ], tags: ['#javascript', '#webdev', '#frameworks', '#technology', '#frontend'] },
+                    'post-responsive-design': { id: 'post-responsive-design', title: "Best practices for responsive design in 2023", content: "<p>With the sheer number of devices... What are your current go-to techniques?</p>", author: '@designpro', authorAvatar: 'https://i.pravatar.cc/32?u=designpro', time: '5 hours ago', upvotes: 38, views: 876, replyCount: 1, isUpvoted: true, isDownvoted: false, replies: [ { id: 'reply-4', author: '@csswiz', authorAvatar: 'https://i.pravatar.cc/32?u=csswiz', text: 'Container queries are finally becoming usable! ... `clamp()` for fluid typography is also essential.', time: '4 hours ago', upvotes: 22 } ], tags: ['#responsive', '#css', '#design', '#frontend'] },
+                    'post-ai-tools': { id: 'post-ai-tools', title: "Anyone using AI tools in their development workflow?", content: "<p>I've been experimenting with GitHub Copilot... What has your experience been like?</p>", author: '@aienthusiast', authorAvatar: 'https://i.pravatar.cc/32?u=aienthusiast', time: '8 hours ago', upvotes: 29, views: 1520, replyCount: 2, isUpvoted: false, isDownvoted: false, replies: [ { id: 'reply-5', author: '@coderX', authorAvatar: 'https://i.pravatar.cc/32?u=coderX', text: 'Copilot is amazing for boilerplate... but you HAVE to review its suggestions carefully.', time: '7 hours ago', upvotes: 12 }, { id: 'reply-6', author: '@debugmaster', authorAvatar: 'https://i.pravatar.cc/32?u=debugmaster', text: 'Using ChatGPT for debugging complex issues has been surprisingly helpful...', time: '6 hours ago', upvotes: 8 } ], tags: ['#ai', '#programming', '#productivity', '#tools', '#technology'] },
+                    'post-career-advice': { id: 'post-career-advice', title: "Advice for Junior Developers breaking into the industry?", content: "<p>What's the most important advice you'd give to someone starting their first developer role?</p>", author: '@careercoach', authorAvatar: 'https://i.pravatar.cc/32?u=careercoach', time: '1 day ago', upvotes: 55, views: 2100, replyCount: 5, isUpvoted: false, isDownvoted: false, replies: [], tags: ['#career', '#jobs', '#webdev', '#advice', '#business'] }
+                };
+                let currentFilter = { type: 'all', value: 'All Posts' };
+
+                 // --- Render Post List Item (No change needed, uses data) ---
+                 function renderPostListItem(postData) { /* ... (same as previous version) ... */ const tagsHTML = postData.tags.map(tag => `<span class="badge text-xs interactive" data-tag-id="${tag}">${tag}</span>`).join(''); const upvoteClass = postData.isUpvoted ? 'upvoted text-orange-500' : 'text-gray-400'; const downvoteClass = postData.isDownvoted ? 'downvoted text-blue-500' : 'text-gray-400'; return `<div class="forum-post flex" data-post-id="${postData.id}"><div class="mr-4 flex flex-col items-center pt-1 flex-shrink-0 w-10"><button class="vote-btn ${upvoteClass} hover:text-orange-500 w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 mb-1" data-vote="up" title="Upvote"><i class="fas fa-chevron-up"></i></button><div class="post-score font-medium text-sm text-gray-700">${postData.upvotes}</div><button class="vote-btn ${downvoteClass} hover:text-blue-500 w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 mt-1" data-vote="down" title="Downvote"><i class="fas fa-chevron-down"></i></button></div><div class="flex-1 overflow-hidden"><div class="font-medium text-lg mb-1 leading-tight hover:text-indigo-700">${postData.title}</div><div class="text-sm text-gray-600 mb-2 line-clamp-2">${postData.content.replace(/<[^>]*>/g, '').substring(0, 150)}...</div><div class="flex items-center text-xs text-gray-500 mt-2 flex-wrap gap-x-3 gap-y-1"><span><i class="far fa-comment mr-1"></i> ${postData.replyCount} ${postData.replyCount === 1 ? 'reply' : 'replies'}</span><span><i class="far fa-eye mr-1"></i> ${formatCount(postData.views)} views</span><span>by <span class="text-indigo-600 font-medium">${postData.author}</span> ${postData.time}</span></div><div class="flex flex-wrap gap-1 mt-2">${tagsHTML}</div></div></div>`; }
+
+                 // --- Function to Apply Filters and Display Post List ---
+                 function displayPostList() { /* ... (same as previous version) ... */ postsListContainer.innerHTML = ''; let postsToDisplay = Object.values(forumPostsData); const searchTerm = forumSearch.value.toLowerCase().trim(); if (currentFilter.type === 'category' && currentFilter.value !== 'all') { postsToDisplay = postsToDisplay.filter(post => post.tags.includes(`#${currentFilter.value}`)); } else if (currentFilter.type === 'tag') { postsToDisplay = postsToDisplay.filter(post => post.tags.includes(currentFilter.value)); } if (searchTerm) { postsToDisplay = postsToDisplay.filter(post => post.title.toLowerCase().includes(searchTerm) || post.content.toLowerCase().includes(searchTerm) || post.author.toLowerCase().includes(searchTerm) || post.tags.some(tag => tag.toLowerCase().includes(searchTerm)) ); } currentFilterDisplay.textContent = searchTerm ? `Search results for "${searchTerm}"` : currentFilter.value; if (postsToDisplay.length === 0) { postsListContainer.innerHTML = '<p class="text-center text-gray-500 py-10">No posts found matching your criteria.</p>'; } else { postsToDisplay.sort((a, b) => b.upvotes - a.upvotes); postsToDisplay.forEach(post => { postsListContainer.insertAdjacentHTML('beforeend', renderPostListItem(post)); }); } forumListCard.classList.remove('hidden'); postDetailContainer.classList.add('hidden'); postDetailContainer.innerHTML = ''; }
+
+                 // --- Function to Show Post Detail (Uses authorAvatar from data) ---
+                 function showPostDetail(postId) {
+                    const postData = forumPostsData[postId];
+                    if (!postData) return;
+                     // Updated repliesHTML to use img
+                    let repliesHTML = postData.replies.map(reply => `
+                        <div class="reply border-t border-gray-100 mt-4 pt-4 flex" data-reply-id="${reply.id}">
+                            <div class="avatar w-8 h-8 mr-3 flex-shrink-0"><img src="${reply.authorAvatar}" alt="${reply.author}"></div>
+                            <div class="flex-1"><div class="flex items-center mb-1"><span class="font-medium text-sm mr-2">${reply.author}</span><span class="text-xs text-gray-500">${reply.time}</span><span class="ml-auto text-xs text-gray-500 flex items-center"><button class="text-gray-400 hover:text-orange-500 mr-1 p-1"><i class="fas fa-chevron-up text-xs"></i></button>${reply.upvotes}<button class="text-gray-400 hover:text-blue-500 ml-1 p-1"><i class="fas fa-chevron-down text-xs"></i></button></span></div><div class="text-sm text-gray-700 prose-custom">${reply.text}</div></div>
+                        </div>`).join('');
+                    let tagsHTML = postData.tags.map(tag => `<span class="badge interactive" data-tag-id="${tag}">${tag}</span>`).join('');
+                    const upvoteClass = postData.isUpvoted ? 'upvoted text-orange-500' : 'text-gray-600'; const downvoteClass = postData.isDownvoted ? 'downvoted text-blue-500' : 'text-gray-600';
+                    // Updated main post author avatar
+                     postDetailContainer.innerHTML = `<button id="back-to-forum-list" class="btn btn-secondary btn-sm mb-6 text-xs"><i class="fas fa-arrow-left mr-2"></i>Back to List</button><h3 class="text-2xl font-bold mb-2">${postData.title}</h3><div class="flex items-center text-sm text-gray-500 mb-4 flex-wrap gap-x-3 gap-y-1"><div class="avatar w-6 h-6"><img src="${postData.authorAvatar}" alt="${postData.author}"></div><span>Posted by <span class="text-indigo-600 font-medium">${postData.author}</span> ${postData.time}</span><span>•</span><span>${formatCount(postData.views)} Views</span></div><div class="flex flex-wrap gap-1 mb-6">${tagsHTML}</div><hr class="mb-6"><div class="prose-custom mb-8">${postData.content}</div><div class="flex items-center mb-6 space-x-4 text-sm"><button class="flex items-center ${upvoteClass} hover:text-orange-500 vote-btn-detail" data-vote="up"><i class="fas fa-chevron-up mr-1"></i> ${postData.upvotes} Upvotes</button><button class="flex items-center ${downvoteClass} hover:text-blue-500 vote-btn-detail" data-vote="down"><i class="fas fa-chevron-down mr-1"></i> Downvote</button><button class="flex items-center text-gray-600 hover:text-indigo-600"><i class="far fa-comment mr-1"></i> ${postData.replyCount} Replies</button><button class="flex items-center text-gray-600 hover:text-yellow-500"><i class="far fa-bookmark mr-1"></i> Bookmark</button></div><hr class="mb-6"><h4 class="font-semibold text-lg mb-4">${postData.replyCount} Replies</h4><div class="replies-container mb-6">${repliesHTML || '<p class="text-sm text-gray-500">No replies yet.</p>'}</div><div class="reply-form border-t border-gray-200 pt-6"><h5 class="font-medium mb-2">Leave a Reply</h5><textarea id="reply-textarea" class="w-full p-2 border border-gray-300 rounded-lg mb-2 focus:ring-indigo-500 focus:border-indigo-500" rows="3" placeholder="Write your reply here..."></textarea><button class="btn btn-primary" id="post-reply-btn">Post Reply</button></div>`;
+                    /* ... (rest of showPostDetail logic same as before) ... */
+                     forumListCard.classList.add('hidden'); postDetailContainer.classList.remove('hidden'); document.getElementById('back-to-forum-list')?.addEventListener('click', displayPostList); const postReplyBtn = document.getElementById('post-reply-btn'); const replyTextarea = document.getElementById('reply-textarea'); postReplyBtn?.addEventListener('click', () => { const replyText = replyTextarea.value.trim(); if(replyText){ postReplyBtn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i>Posting...`; postReplyBtn.disabled = true; setTimeout(() => { alert('Reply submitted! (Simulation)'); replyTextarea.value = ''; postReplyBtn.innerHTML = `Post Reply`; postReplyBtn.disabled = false; }, 1000); } }); postDetailContainer.querySelectorAll('.badge.interactive').forEach(tag => { tag.addEventListener('click', (e) => { currentFilter = { type: 'tag', value: e.target.dataset.tagId }; displayPostList(); }); }); postDetailContainer.querySelectorAll('.vote-btn-detail').forEach(button => { button.addEventListener('click', (e) => handleVote(postId, button.dataset.vote, postDetailContainer)); }); window.scrollTo(0, 0);
+                }
+
+                 // --- Function to Handle Voting ---
+                 function handleVote(postId, voteType, contextElement = postsListContainer) { /* ... (same as previous version) ... */ const postData = forumPostsData[postId]; if (!postData) return; const scoreElement = contextElement.querySelector(`[data-post-id="${postId}"] .post-score`) || contextElement.querySelector('.vote-btn-detail[data-vote="up"]'); const upvoteBtn = contextElement.querySelector(`[data-post-id="${postId}"] .vote-btn[data-vote="up"]`) || contextElement.querySelector('.vote-btn-detail[data-vote="up"]'); const downvoteBtn = contextElement.querySelector(`[data-post-id="${postId}"] .vote-btn[data-vote="down"]`) || contextElement.querySelector('.vote-btn-detail[data-vote="down"]'); let scoreChange = 0; if (voteType === 'up') { if (postData.isUpvoted) { scoreChange = -1; postData.isUpvoted = false; } else { scoreChange = postData.isDownvoted ? 2 : 1; postData.isUpvoted = true; postData.isDownvoted = false; } } else if (voteType === 'down') { if (postData.isDownvoted) { scoreChange = 1; postData.isDownvoted = false; } else { scoreChange = postData.isUpvoted ? -2 : -1; postData.isDownvoted = true; postData.isUpvoted = false; } } postData.upvotes += scoreChange; if (scoreElement) { if (contextElement === postDetailContainer) { scoreElement.textContent = `${postData.upvotes} Upvotes`; } else { scoreElement.textContent = postData.upvotes; } } upvoteBtn?.classList.toggle('upvoted', postData.isUpvoted); upvoteBtn?.classList.toggle('text-orange-500', postData.isUpvoted); upvoteBtn?.classList.toggle('text-gray-400', !postData.isUpvoted); downvoteBtn?.classList.toggle('downvoted', postData.isDownvoted); downvoteBtn?.classList.toggle('text-blue-500', postData.isDownvoted); downvoteBtn?.classList.toggle('text-gray-400', !postData.isDownvoted); if (contextElement === postDetailContainer && voteType === 'down') { downvoteBtn.textContent = postData.isDownvoted ? 'Downvoted' : 'Downvote'; } console.log(`${voteType}voted post: ${postId}. New score: ${postData.upvotes}`); }
+
+                // --- Event Listeners ---
+                 forumContainer.addEventListener('click', function(event) { /* ... (same event handling logic as before, calls updated display/render functions) ... */ const categoryItem = event.target.closest('.category-item'); const tagItem = event.target.closest('.tags-container .badge.interactive, #forum-post-detail .badge.interactive'); const postItem = event.target.closest('.forum-post'); const voteButton = event.target.closest('.vote-btn'); if (categoryItem && categoriesContainer.contains(categoryItem)) { const categoryId = categoryItem.dataset.categoryId; currentFilter = { type: 'category', value: categoryId }; currentFilterDisplay.textContent = categoryItem.querySelector('span').textContent; categoriesContainer.querySelectorAll('.category-item').forEach(item => item.classList.remove('bg-indigo-50', 'text-indigo-700', 'font-medium')); categoryItem.classList.add('bg-indigo-50', 'text-indigo-700', 'font-medium'); displayPostList(); forumSearch.value = ''; } else if (tagItem) { const tagId = tagItem.dataset.tagId; currentFilter = { type: 'tag', value: tagId }; currentFilterDisplay.textContent = `Posts tagged "${tagId}"`; categoriesContainer?.querySelectorAll('.category-item').forEach(item => item.classList.remove('bg-indigo-50', 'text-indigo-700', 'font-medium')); tagsContainer.querySelectorAll('.badge').forEach(item => item.classList.remove('badge-primary')); tagItem.classList.add('badge-primary'); displayPostList(); forumSearch.value = ''; } else if (voteButton && postItem) { event.stopPropagation(); handleVote(postItem.dataset.postId, voteButton.dataset.vote, postsListContainer); } else if (postItem && postsListContainer.contains(postItem)) { if (event.target.closest('.font-medium.text-lg') || event.target.closest('.text-sm.text-gray-600')) { const postId = postItem.dataset.postId; if (postId) showPostDetail(postId); } } });
+                 forumSearch.addEventListener('input', displayPostList);
+                 newThreadBtn.addEventListener('click', () => { alert('Opening New Thread form! (Simulation)'); });
+                 categoriesContainer.querySelector('[data-category-id="all"]')?.classList.add('bg-indigo-50', 'text-indigo-700', 'font-medium'); displayPostList();
+            }
+
+
+            // --- 4. Voice Rooms (Updated Avatar URLs) ---
+            function initializeVoiceRooms() {
+                 console.log("Initializing Enhanced Voice Rooms Section...");
+                 /* ... (selectors same as before) ... */
+                 const roomsContainer = document.getElementById('voice-rooms'); const createRoomBtn = document.getElementById('create-room-btn'); const liveRoomsList = document.getElementById('live-rooms-list'); const categoriesList = roomsContainer.querySelector('.card:last-child .space-y-1');
+                 if (!roomsContainer || !createRoomBtn || !liveRoomsList || !categoriesList) { console.error("One or more voice room elements not found for enhanced initialization!"); return; }
+                 const userAvatarSrc = 'https://i.pravatar.cc/32?u=me'; // User's avatar
+
+                // --- Update Room UI (uses img src) ---
+                 function updateRoomUI(roomCard, isJoining) {
+                     const joinLeaveBtn = roomCard.querySelector('.join-leave-btn');
+                     const speakersList = roomCard.querySelector('.speakers-list');
+                     if (isJoining) {
+                         roomCard.classList.add('joining'); joinLeaveBtn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i>Joining...`; joinLeaveBtn.disabled = true;
+                         setTimeout(() => {
+                             roomCard.classList.remove('joining'); roomCard.classList.add('joined'); joinLeaveBtn.innerHTML = `<i class="fas fa-sign-out-alt mr-2"></i>Leave Room`; joinLeaveBtn.classList.replace('btn-primary', 'btn-danger'); joinLeaveBtn.disabled = false;
+                             const userAvatarElement = document.createElement('div'); // Create div container first
+                             userAvatarElement.className = "avatar w-8 h-8 border-2 border-white z-50 user-avatar"; // Use avatar class
+                             userAvatarElement.innerHTML = `<img src="${userAvatarSrc}" alt="You" title="You">`; // Add img inside
+                             speakersList.appendChild(userAvatarElement);
+                         }, 1000);
+                     } else {
+                         roomCard.classList.remove('joined'); joinLeaveBtn.innerHTML = `<i class="fas fa-headphones mr-2"></i>Join Room`; joinLeaveBtn.classList.replace('btn-danger', 'btn-primary');
+                         const userAvatarElement = speakersList.querySelector('.user-avatar');
+                         if (userAvatarElement) userAvatarElement.remove();
+                     }
+                 }
+
+                 // --- Event Listeners remain the same ---
+                 roomsContainer.addEventListener('click', function(event) { const joinLeaveBtn = event.target.closest('.join-leave-btn'); const reminderButton = event.target.closest('.set-reminder-btn'); const categoryItem = event.target.closest('.category-item'); if (joinLeaveBtn) { const roomCard = joinLeaveBtn.closest('.voice-room'); if (!roomCard) return; const roomId = roomCard.dataset.roomId; const isJoining = !roomCard.classList.contains('joined'); if (isJoining) { const currentlyJoined = liveRoomsList.querySelector('.voice-room.joined'); if (currentlyJoined && currentlyJoined !== roomCard) { updateRoomUI(currentlyJoined, false); } updateRoomUI(roomCard, true); } else { updateRoomUI(roomCard, false); } } else if (reminderButton) { const reminderId = reminderButton.closest('.scheduled-room').dataset.reminderId; const isSet = reminderButton.textContent.includes('Set'); if (isSet) { reminderButton.innerHTML = `<i class="fas fa-check mr-1"></i> Reminder Set`; reminderButton.disabled = true; reminderButton.classList.add('opacity-70'); showToast(`Reminder set for ${reminderId}!`); } } else if (categoryItem && categoriesList.contains(categoryItem)) { const categoryId = categoryItem.dataset.categoryId; alert(`Filtering rooms by category: ${categoryId} (Simulation)`); categoriesList.querySelectorAll('.category-item').forEach(item => item.classList.remove('bg-gray-100', 'font-medium')); categoryItem.classList.add('bg-gray-100', 'font-medium'); } });
+                 const createRoomModal = document.getElementById('create-room-modal'); const confirmCreateBtn = document.getElementById('confirm-create-room-btn'); const roomNameInput = document.getElementById('room-name'); createRoomBtn.addEventListener('click', () => { roomNameInput.value = ''; createRoomModal.classList.remove('hidden'); }); confirmCreateBtn.addEventListener('click', () => { const roomName = roomNameInput.value.trim(); if (!roomName) { alert('Please enter a room name.'); return; } alert(`Creating room: "${roomName}"... (Simulation)`); closeModal('create-room-modal'); showToast(`Room "${roomName}" created successfully!`); });
+            }
+
+
+            // --- 5. Networking (Updated Avatar URLs) ---
+            function initializeNetworking() {
+                 console.log("Initializing Enhanced Networking Section...");
+                 /* ... (selectors same as before) ... */
+                  const networkingContainer = document.getElementById('networking'); const jobList = document.getElementById('job-list'); const jobListHeader = document.getElementById('job-list-header'); const insightsContainer = networkingContainer.querySelector('.col-span-1.lg\\:col-span-2 .card:last-child'); const connectionsList = document.getElementById('connections-list'); const profileSkillsContainer = networkingContainer.querySelector('.profile-card .flex.flex-wrap'); const editProfileBtn = document.getElementById('edit-profile-btn'); const networkingSearch = document.getElementById('networking-search');
+                  if (!networkingContainer || !jobList || !jobListHeader || !insightsContainer || !connectionsList || !profileSkillsContainer || !editProfileBtn || !networkingSearch) { console.error("One or more networking elements not found for enhanced initialization!"); return; }
+
+                // --- Mock Data (Updated Avatars) ---
+                 const jobData = { 'job-dropbox-ux': { id: 'job-dropbox-ux', title: "Senior UX Designer", company: "Dropbox", location: "San Francisco, CA", salary: "$120K - $150K", posted: "2 days ago", bookmarked: false, description: "<p>We're looking for an experienced UX Designer...</p>", skills: ['UX Design', 'Product Design', 'Figma', 'User Research', 'Collaboration', 'Design Systems'] }, 'job-airbnb-pm': { id: 'job-airbnb-pm', title: "Product Manager", company: "Airbnb", location: "Remote", salary: "$130K - $160K", posted: "5 days ago", bookmarked: true, description: "<p>Join our team as a Product Manager...</p>", skills: ['Product Management', 'Agile', 'User Stories', 'Roadmapping', 'Remote Work', 'Data Analysis'] }, 'job-spotify-fe': { id: 'job-spotify-fe', title: "Front-End Developer", company: "Spotify", location: "New York, NY", salary: "$105K - $140K", posted: "1 week ago", bookmarked: false, description: "<p>Build amazing user interfaces for millions of music lovers...</p>", skills: ['React', 'JavaScript', 'CSS', 'TypeScript', 'Web Performance'] } };
+                 const connectionData = { // Added emails for unique avatar seeds
+                    'sarah-williams': { name: 'Sarah Williams', title: 'UX Researcher @ Google', avatar: 'https://i.pravatar.cc/40?u=sarah.williams@example.com'},
+                    'michael-chen': { name: 'Michael Chen', title: 'Frontend Developer @ Meta', avatar: 'https://i.pravatar.cc/40?u=michael.chen@example.com'},
+                    'emily-r': { name: 'Emily Rodriguez', title: 'Product Manager @ Apple', avatar: 'https://i.pravatar.cc/40?u=emily.r@example.com'}
+                 };
+
+                 // --- Render Functions (Job Card same, Connection updated) ---
+                 function renderJobCard(job) { /* ... (same as previous version) ... */ const bookmarkIconClass = job.bookmarked ? 'fas text-yellow-500' : 'far text-gray-400'; const skillsHTML = job.skills.slice(0, 3).map(skill => `<span class="badge text-xs">${skill}</span>`).join(''); return `<div class="job-card" data-job-id="${job.id}"><div class="flex justify-between items-start mb-2"><div><div class="font-medium text-lg hover:text-indigo-700">${job.title}</div><div class="text-sm text-gray-600">${job.company} • ${job.location}</div></div><button class="text-gray-400 hover:text-yellow-500 p-1 rounded-full bookmark-btn" title="Bookmark job"><i class="${bookmarkIconClass} fa-bookmark text-xl bookmark-icon"></i></button></div><div class="text-sm text-gray-700 mb-3 line-clamp-2">${job.description.replace(/<[^>]*>/g, '')}...</div><div class="flex flex-wrap gap-1 mb-3">${skillsHTML}</div><div class="flex justify-between items-center mt-3"><div class="text-xs text-gray-500"><i class="far fa-clock mr-1"></i> Posted ${job.posted}</div><div class="flex items-center space-x-2"><span class="font-medium text-green-600 text-sm">${job.salary}</span><button class="btn btn-primary btn-sm text-xs px-3 py-1 apply-job-btn">Apply Now</button></div></div></div>`; }
+                 function renderConnection(connId, conn) {
+                     return `
+                        <div class="network-item flex items-center cursor-pointer hover:bg-gray-50 p-2 -m-2 rounded-md" data-connection-id="${connId}">
+                            <div class="avatar w-10 h-10 mr-3"><img src="${conn.avatar}" alt="${conn.name}"></div>
+                            <div class="flex-1"><div class="font-medium text-sm">${conn.name}</div><div class="text-xs text-gray-500">${conn.title}</div></div>
+                            <button class="text-indigo-600 hover:bg-indigo-100 p-2 rounded-full ml-2 flex-shrink-0 message-btn" title="Message ${conn.name}"><i class="fas fa-comment-dots"></i></button>
+                        </div>`;
+                 }
+
+                 function displayJobs(filterSkill = null) { /* ... (same logic as before) ... */ jobList.innerHTML = ''; let jobsToDisplay = Object.values(jobData); const searchTerm = networkingSearch.value.toLowerCase().trim(); if (filterSkill) { jobsToDisplay = jobsToDisplay.filter(job => job.skills.map(s => s.toLowerCase()).includes(filterSkill.toLowerCase())); jobListHeader.textContent = `Jobs requiring ${filterSkill}`; } else if (searchTerm) { jobsToDisplay = jobsToDisplay.filter(job => job.title.toLowerCase().includes(searchTerm) || job.company.toLowerCase().includes(searchTerm) || job.skills.some(s => s.toLowerCase().includes(searchTerm)) ); jobListHeader.textContent = `Job search results for "${searchTerm}"`; } else { jobListHeader.textContent = `Recommended Jobs`; } if (jobsToDisplay.length === 0) { jobList.innerHTML = '<p class="text-center text-gray-500 py-5">No jobs found matching your criteria.</p>'; } else { jobsToDisplay.forEach(job => jobList.insertAdjacentHTML('beforeend', renderJobCard(job))); } }
+                 function displayConnections() {
+                     connectionsList.innerHTML = '';
+                     Object.entries(connectionData).forEach(([id, conn]) => {
+                         connectionsList.insertAdjacentHTML('beforeend', renderConnection(id, conn));
+                     });
+                 }
+
+                  // --- Modal Function ---
+                 function showJobDetailModal(jobId) { /* ... (same as previous version, ensure img src uses data) ... */ const details = jobData[jobId]; if (!details) { alert("Job details not found."); return; } const skillsList = details.skills.map(skill => `<span class="badge interactive">${skill}</span>`).join(''); const modalHTML = `<div id="job-detail-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-[100] p-4" style="backdrop-filter: blur(4px);"><div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 relative"><button onclick="closeModal('job-detail-modal')" class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-2xl">&times;</button><h3 class="text-2xl font-bold mb-2">${details.title}</h3><p class="text-gray-600 mb-1">${details.company} • ${details.location}</p><p class="text-sm text-gray-500 mb-4">Posted ${details.posted} • ${details.salary}</p><div class="prose prose-sm max-w-none text-gray-700 mb-6">${details.description}</div><div class="mb-6"><h4 class="font-semibold mb-2">Skills Required</h4><div class="flex flex-wrap gap-2">${skillsList}</div></div><div class="flex justify-end space-x-3 border-t pt-4"><button onclick="closeModal('job-detail-modal')" class="btn btn-secondary">Close</button><button class="btn btn-primary apply-job-btn" data-job-id="${jobId}">Apply Now</button><button class="btn btn-secondary bookmark-btn" title="Bookmark job" data-job-id="${jobId}"><i class="${details.bookmarked ? 'fas text-yellow-500' : 'far'} fa-bookmark bookmark-icon"></i></button></div></div></div>`; document.body.insertAdjacentHTML('beforeend', modalHTML); }
+
+                 // --- Event Listener ---
+                networkingContainer.addEventListener('click', function(event) { /* ... (same logic as before) ... */ const jobCard = event.target.closest('.job-card'); const applyButton = event.target.closest('.apply-job-btn'); const bookmarkButton = event.target.closest('.bookmark-btn'); const bookmarkIcon = event.target.closest('.bookmark-icon'); const insightItem = event.target.closest('.article-item'); const connectionItem = event.target.closest('.network-item'); const messageBtn = event.target.closest('.message-btn'); const skillBadge = event.target.closest('.profile-card .badge.interactive'); const jobSkillBadge = event.target.closest('#job-detail-modal .badge.interactive'); if (applyButton) { event.stopPropagation(); const applyJobId = applyButton.dataset.jobId || jobCard?.dataset.jobId; alert(`Applying for ${jobData[applyJobId]?.title}... (Simulation)`); closeModal('job-detail-modal'); } else if (bookmarkButton) { event.stopPropagation(); const bookmarkJobId = bookmarkButton.dataset.jobId || jobCard?.dataset.jobId; const job = jobData[bookmarkJobId]; if (job) { job.bookmarked = !job.bookmarked; const icon = bookmarkButton.querySelector('.bookmark-icon'); icon.classList.toggle('fas', job.bookmarked); icon.classList.toggle('far', !job.bookmarked); icon.classList.toggle('text-yellow-500', job.bookmarked); const cardIcon = jobList.querySelector(`.job-card[data-job-id="${bookmarkJobId}"] .bookmark-icon`); if (cardIcon) { cardIcon.className = icon.className; } showToast(job.bookmarked ? `Job "${job.title}" saved!` : `Bookmark removed.`); } } else if (jobCard && !applyButton && !bookmarkButton && !bookmarkIcon) { const jobId = jobCard.dataset.jobId; if (jobId) showJobDetailModal(jobId); } else if (insightItem) { const articleId = insightItem.dataset.articleId; alert(`Opening article: "${articleId}" (Simulation)`); } else if (messageBtn && connectionItem) { event.stopPropagation(); const connId = connectionItem.dataset.connectionId; alert(`Opening message with ${connectionData[connId]?.name}... (Simulation)`); } else if (connectionItem && !messageBtn) { const connId = connectionItem.dataset.connectionId; alert(`Viewing profile of ${connectionData[connId]?.name}... (Simulation)`); } else if (skillBadge && profileSkillsContainer.contains(skillBadge)) { const skillId = skillBadge.dataset.skillId; networkingSearch.value = skillBadge.textContent; displayJobs(skillBadge.textContent); showToast(`Showing jobs requiring ${skillBadge.textContent}`); } else if (jobSkillBadge && event.target.closest('#job-detail-modal')) { const skill = jobSkillBadge.textContent; closeModal('job-detail-modal'); networkingSearch.value = skill; displayJobs(skill); showToast(`Showing jobs requiring ${skill}`); } });
+                editProfileBtn.addEventListener('click', () => { setActiveSection('settings'); setTimeout(() => { const accountSettingsItem = document.querySelector('.settings-item[data-panel-id="settings-account-panel"]'); accountSettingsItem?.click(); document.getElementById('first-name')?.focus(); }, 50); });
+                networkingSearch.addEventListener('input', () => displayJobs());
+
+                 // Initial display
+                 displayJobs();
+                 displayConnections();
+            }
+
+
+            // --- 6. Settings (No changes needed for avatars) ---
+            function initializeSettings() { /* ... (same enhanced settings logic as before) ... */ console.log("Initializing Enhanced Settings Section..."); const settingsMenu = document.querySelector('#settings .settings-nav'); const settingsPanelsContainer = document.querySelector('#settings .settings-panels-container'); if (!settingsMenu || !settingsPanelsContainer) { console.error("One or more settings elements not found for enhanced initialization!"); return; } let activePanelId = null; settingsMenu.addEventListener('click', function(event) { const clickedItem = event.target.closest('.settings-item'); if (!clickedItem) return; const panelId = clickedItem.dataset.panelId; if (!panelId || panelId === activePanelId) return; activePanelId = panelId; settingsMenu.querySelectorAll('.settings-item').forEach(item => { item.classList.remove('active', 'bg-indigo-50', 'text-indigo-700', 'font-medium'); item.querySelector('i')?.classList.replace('text-indigo-600', 'text-gray-500'); }); clickedItem.classList.add('active', 'bg-indigo-50', 'text-indigo-700', 'font-medium'); clickedItem.querySelector('i')?.classList.replace('text-gray-500', 'text-indigo-600'); settingsPanelsContainer.querySelectorAll('.card').forEach(panel => panel.classList.add('hidden')); const targetPanel = document.getElementById(panelId); if (targetPanel) { targetPanel.classList.remove('hidden'); } else { document.getElementById('settings-default-message')?.classList.remove('hidden'); } }); settingsPanelsContainer.addEventListener('submit', function(event) { if (event.target.tagName === 'FORM') { event.preventDefault(); const form = event.target; const saveButton = form.querySelector('.save-settings-btn'); const originalText = saveButton.innerHTML; saveButton.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i>Saving...`; saveButton.disabled = true; setTimeout(() => { saveButton.innerHTML = originalText; saveButton.disabled = false; const group = form.dataset.saveGroup || 'Settings'; showToast(`${group.charAt(0).toUpperCase() + group.slice(1)} saved successfully!`); console.log(`Simulated save for: ${group}`, Object.fromEntries(new FormData(form))); }, 1200); } }); settingsPanelsContainer.addEventListener('click', function(event) { const themeBtn = event.target.closest('.theme-btn'); if (themeBtn) { const theme = themeBtn.dataset.theme; document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.add('bg-gray-100')); themeBtn.classList.remove('bg-gray-100'); alert(`Theme set to: ${theme} (Simulation - would apply classes to <html> or <body>)`); } }); const firstMenuItem = settingsMenu.querySelector('.settings-item'); if (firstMenuItem) firstMenuItem.click(); }
+
+
+            // --- Initialize Default Section ---
+            setActiveSection(currentActiveSection);
+
+        }); // End DOMContentLoaded
+    </script>
+</body>
+</html>
